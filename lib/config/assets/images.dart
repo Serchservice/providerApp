@@ -34,6 +34,8 @@ class SImages{
   static const review = "asset/anim/excellent-review.png";
   static const receiveGiftBox = "asset/anim/receive-gift-box.png";
   static const verified = "asset/anim/verify.png";
+  static const notes = "asset/anim/notes.png";
+  static const security = "asset/anim/security.png";
 
   //ChooseService Images
   static const electrician = "asset/anim/electrician.png";

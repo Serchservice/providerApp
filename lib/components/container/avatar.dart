@@ -15,7 +15,7 @@ class AvatarPicture extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String gender = Provider.of<UserInformation>(context, listen: false).user.gender ?? "";
-    String service = Provider.of<UserServiceInformation>(context, listen: false).service ?? "";
+    String service = Provider.of<UserServiceInformation>(context, listen: false).model.service ?? "";
     return CircleAvatar(
       radius: radius,
       backgroundColor: SColors.lightPurple,
@@ -69,7 +69,7 @@ class SSPicture extends StatelessWidget {
   const SSPicture.large({super.key}) : radius = 30;
   @override
   Widget build(BuildContext context) {
-    String service = Provider.of<UserServiceInformation>(context, listen: false).service ?? "";
+    String service = Provider.of<UserServiceInformation>(context, listen: false).model.service ?? "";
     String firstName = Provider.of<UserInformation>(context, listen: false).user.firstName ?? "";
     String lastName = Provider.of<UserInformation>(context, listen: false).user.lastName ?? "";
     String initials() {
@@ -121,7 +121,8 @@ class Avatar extends StatelessWidget {
       return AvatarPicture(radius: radius);
     } else {
       final imagePath = image!;
-      final userImage = imagePath.contains("https://") ? NetworkImage(imagePath) : FileImage(File(imagePath));
+      final userImage = imagePath.contains("https://") ? NetworkImage(imagePath)
+      : imagePath.startsWith("/") ? FileImage(File(imagePath)) : AssetImage(imagePath);
       return CircleAvatar(
         radius: radius,
         backgroundColor: SColors.lightPurple,

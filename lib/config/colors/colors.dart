@@ -12,15 +12,16 @@ abstract class SColors{
 
   ///Secondary Colors
   static const lightPurp = Color(0xff3B043B);
-  static const darkPurp = Color(0xFF740274);
+  // static const darkPurp = Color(0xFF740274);
 
   static const lightPurple = Color(0xff6C0062);
-  static const darkPurple = Color(0xff3F0F36);
+  // static const darkPurple = Color(0xff3F0F36);
 
   ///Dark Colors
   static const darkTheme = Colors.black;
-  static const darkTheme1 = Color(0xff0A0A0A);
-  static const darkTheme2 = Color(0xff1A1A1A);
+  static const darked = Color(0xFF07070A);
+  static const darkTheme1 = Color(0xff030001);
+  static const darkTheme2 = Color(0xFF07070A);
   static const darkTheme3 = Color(0xff2E2E2E);
   static const darkTheme4 = Color(0xff424242);
 
@@ -34,8 +35,6 @@ abstract class SColors{
   static const disabledLight = Color(0xFFB3B3B3);
   static const disabledDark = Color(0xFF696969);
   static const lightColor = Color(0xFFF6F6F6);
-  static const darkColor = Color(0xFF0A0A0A);
-  static const lighter = Color(0xFFACACAC);
   static const darker = Color(0xFF0A0A0A);
   static const green = Color(0xff03B800);
   static const red = Color(0xffB80000);
@@ -45,7 +44,6 @@ abstract class SColors{
   static const shimmerHigh = Color.fromARGB(255, 64, 64, 64);
   static const shimmer = Color(0xFF111111);
   static const grey = Color(0xff383838);
-  static const enabledBorderLight = Color(0xFFDADADA);
   static const enabledBorderDark = Color.fromARGB(255, 16, 16, 16);
   static const hint = Color(0xFF8C8C8C);
   static const blue = Color(0xFF000870);

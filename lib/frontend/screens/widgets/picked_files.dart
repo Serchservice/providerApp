@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:animate_do/animate_do.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -123,6 +120,7 @@ class _ViewPickedFilesState extends State<ViewPickedFiles> {
                           
                       return fileWidget(
                         file: file,
+                        context: context,
                         onLongPress: () {
                           setState(() {
                             count = index;
@@ -253,56 +251,6 @@ class _ViewPickedFilesState extends State<ViewPickedFiles> {
             )
           ],
         ),
-      )
-    );
-  }
-
-  Widget fileWidget({
-    required PlatformFile file, required void Function()? onLongPress
-  }){
-    final kb = file.size / 7024;
-    final mb = kb / 1024;
-    final fileSize = mb >= 1 ? "${mb.toStringAsFixed(2)} MB" : "${kb.toStringAsFixed(2)} KB";
-    final extension = file.extension ?? "none";
-    debugShow(file.identifier);
-    final color = getExtensionColor(extension);
-
-    return InkWell(
-      // onTap: () => widget.onDependFile(file),
-      onTap: () => OpenFilex.open(file.path),
-      onLongPress: onLongPress,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Container(
-              alignment: Alignment.center,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: SText(
-                text: '.$extension',
-                size: 20,
-                color: Theme.of(context).primaryColor
-              )
-            )
-          ),
-          const SizedBox(height: 8),
-          SText(
-            text: file.name,
-            size: 18,
-            flow: TextOverflow.ellipsis,
-            color: Theme.of(context).primaryColor
-          ),
-          SText(
-            text: fileSize,
-            size: 16,
-            flow: TextOverflow.ellipsis,
-            color: Theme.of(context).primaryColor
-          ),
-        ]
       )
     );
   }

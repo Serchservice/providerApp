@@ -26,7 +26,7 @@ class _FAQSettingScreenState extends State<FAQSettingScreen> {
               color: Theme.of(context).primaryColorLight
             ),
             leading: IconButton(
-              onPressed: () => Get.back(),
+              onPressed: () => Get.offAll(() => const BottomNavigator(newPage: 3)),
               icon: Icon(
                 CupertinoIcons.chevron_back,
                 color: Theme.of(context).primaryColorLight,
@@ -103,14 +103,18 @@ class _FAQSettingScreenState extends State<FAQSettingScreen> {
                     onPressed: () => makePhoneCall("09164806343")
                   ),
                   const SizedBox(height: 20),
-                  const SButtonText(
+                  SButtonText(
                     text: "Can't find your problem?",
-                    textButton: "Ask your question"
+                    textColor: Theme.of(context).primaryColorLight,
+                    textButton: "Ask your question",
+                    onClick: () => Get.to(() => const AskQuestionScreen()),
                   ),
-                  const SizedBox(height: 10),
-                  const SButtonText(
+                  const SizedBox(height: 15),
+                  SButtonText(
                     text: "Want to ask something else?",
-                    textButton: "Talk to support"
+                    textColor: Theme.of(context).primaryColorLight,
+                    textButton: "Talk to support",
+                    onClick: () => launchMail(helpMail)
                   ),
                   const SizedBox(height: 40),
                 ]

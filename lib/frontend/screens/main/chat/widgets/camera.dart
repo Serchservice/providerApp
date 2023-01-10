@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
@@ -18,42 +17,47 @@ class CameraScreen extends StatefulWidget{
 
 class _CameraScreenState extends State<CameraScreen> {
   late CameraController camController;
-  Future<void>? cameraValue;
   bool flash = false;
   bool recording = false;
   bool frontCamera = false;
   double transform = 0;
 
-  void initCamera() {
-    camController = CameraController(cameras[0], ResolutionPreset.high);
-    // cameraValue = camController.initialize();
-    cameraValue = camController.initialize().then((_) {
-      if (!mounted) {
-        return;
+  //Initialize camera
+  void initCamera({int position = 0}) async {
+    camController = CameraController(
+      cameras[position], ResolutionPreset.high
+    );
+    try {
+      await camController.initialize().then((_) {
+      if (!mounted) return;
+      setState(() {});
+      });
+    } on CameraException catch (e) {
+      switch (e.code) {
+        case 'CameraAccessDenied':
+          showGetSnackbar(
+            message: e.description!,
+            type: Popup.error,
+            duration: const Duration(seconds: 5)
+          );
+          break;
+        case 'AudioAccessDenied':
+          showGetSnackbar(
+            message: e.description!,
+            type: Popup.error,
+            duration: const Duration(seconds: 5)
+          );
+          break;
+        default:
+          showGetSnackbar(
+            message: e.description!,
+            type: Popup.error,
+            duration: const Duration(seconds: 5)
+          );
+          break;
       }
-      setState(() {}); //To refresh widget
-    }).catchError((Object e) {
-      if (e is CameraException) {
-        switch (e.code) {
-          case 'CameraAccessDenied':
-            showGetSnackbar(
-              message: e.description!,
-              type: Popup.error,
-              duration: const Duration(seconds: 5)
-            );
-            debugShow('User denied camera access.');
-            break;
-          default:
-            showGetSnackbar(
-              message: e.description!,
-              type: Popup.error,
-              duration: const Duration(seconds: 5)
-            );
-            debugShow('Handle other errors.');
-            break;
-        }
-      }
-    });
+      debugPrint("camera error $e");
+    }
   }
 
   @override
@@ -69,6 +73,7 @@ class _CameraScreenState extends State<CameraScreen> {
     super.dispose();
   }
 
+  //Take Picture
   void takePhoto(context) async {
     // final path = join((await getTemporaryDirectory()).path, "${DateTime.now()}.png");
     XFile path = await camController.takePicture();
@@ -78,64 +83,38 @@ class _CameraScreenState extends State<CameraScreen> {
     Navigator.of(context).push(CameraViewPicture.route(path.path));
   }
 
+  //Start video recording
   void startVideo(context) async {
     // final path = join((await getTemporaryDirectory()).path, "${DateTime.now()}.mp4");
     await camController.startVideoRecording();
     setState(() => recording = true);
   }
 
+  //Stop video recording
   void stopVideo(context) async {
     XFile path = await camController.stopVideoRecording();
     setState(() => recording = false);
     Navigator.of(context).push(CameraViewVideo.route(path.path));
   }
 
+  //Set Flash mode
   void setFlash() {
     setState(() => flash = !flash);
     flash ? camController.setFlashMode(FlashMode.torch)
     : camController.setFlashMode(FlashMode.off);
   }
 
+  //Flip camera
   void flipCamera() async {
     setState(() {
       frontCamera = !frontCamera;
       transform = transform + pi;
     });
     int cameraPosition = frontCamera ? 1 : 0;
-    camController = CameraController(
-      cameras[cameraPosition], ResolutionPreset.high
-    );
-    cameraValue = camController.initialize().then((_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {});
-    }).catchError((Object e) {
-      if (e is CameraException) {
-        switch (e.code) {
-          case 'CameraAccessDenied':
-            showGetSnackbar(
-              message: e.description!,
-              type: Popup.error,
-              duration: const Duration(seconds: 5)
-            );
-            debugShow('User denied camera access.');
-            break;
-          default:
-            showGetSnackbar(
-              message: e.description!,
-              type: Popup.error,
-              duration: const Duration(seconds: 5)
-            );
-            debugShow('Handle other errors.');
-            break;
-        }
-      }
-    });
+    initCamera(position: cameraPosition);
   }
 
   @override
-
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -152,36 +131,19 @@ class _CameraScreenState extends State<CameraScreen> {
         ),
         title: recording ? Padding(
           padding: const EdgeInsets.only(right: 10, top: 10),
-          child: DefaultTextStyle(
-            style: const TextStyle(
-              fontSize: 24,
-              color: SColors.red
+          child: Center(
+            child: HeartBeating(
+              child: const SText(text: "Recording", color: SColors.red, size: 24),
             ),
-            child: AnimatedTextKit(
-              repeatForever: true,
-              pause: const Duration(milliseconds: 100),
-              animatedTexts: [
-                ScaleAnimatedText("Recording")
-              ],
-            )
-          )
+          ),
         ) : null,
         centerTitle: true,
       ),
       body: !camController.value.isInitialized
-      ? SLoader.fallingDot()
+      ? Center(child: SLoader.fallingDot(color: SColors.black, size: 60,))
       : Column(
         children: [
-          FutureBuilder(
-            future: cameraValue,
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if(snapshot.connectionState == ConnectionState.done){
-                return Expanded(child: SizedBox(width: MediaQuery.of(context).size.width, child: CameraPreview(camController)));
-              } else {
-                return Expanded(child: SizedBox(width: MediaQuery.of(context).size.width, child: Center(child: SLoader.fallingDot())));
-              }
-            },
-          ),
+          Expanded(child: SizedBox(width: MediaQuery.of(context).size.width, child: CameraPreview(camController))),
           Container(
             width: MediaQuery.of(context).size.width,
             padding: screenPadding,
@@ -230,14 +192,6 @@ class _CameraScreenState extends State<CameraScreen> {
           )
         ],
       )
-      // body: Column(
-      //   children: [
-      //     Expanded(),
-      //     Container(
-
-      //     )
-      //   ]
-      // ),
     );
   }
 }

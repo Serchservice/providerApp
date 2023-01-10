@@ -34,10 +34,10 @@ export 'centre/pages/profile.dart';
 export 'centre/pages/edit_profile.dart';
 export 'centre/pages/tip2fix_wallet.dart';
 export 'centre/pages/amt_to_withdraw.dart';
+export 'centre/pages/account_request.dart';
+export 'centre/pages/delete_account.dart';
 
-export 'centre/widgets/bookmarked.dart';
 export 'centre/widgets/files_tab.dart';
-export 'centre/widgets/no_bookmark.dart';
 export 'centre/widgets/no_referral.dart';
 export 'centre/widgets/rating_tab.dart';
 export 'centre/widgets/refer_tree.dart';
@@ -62,13 +62,12 @@ export 'chat/widgets/message.dart';
 export 'chat/widgets/camera.dart';
 export 'chat/widgets/camera_picture.dart';
 export 'chat/widgets/camera_video.dart';
+export 'chat/widgets/message_time.dart';
 
 export 'chat/chat.dart';
 
 
 export 'home/map/home_map.dart';
-
-export 'home/slide/connection_profile.dart';
 export 'home/slide/connected_profile.dart';
 export 'home/slide/collapsed.dart';
 export 'home/slide/panel.dart';
@@ -79,6 +78,12 @@ export 'setting/pages/faq.dart';
 export 'setting/pages/help.dart';
 export 'setting/pages/security.dart';
 export 'setting/pages/preferences.dart';
-export 'setting/pages/change_password.dart';
+export 'setting/pages/app_info.dart';
+
+export 'setting/others/security/change_password.dart';
+export 'setting/others/security/tfa.dart';
+export 'setting/others/ask_question.dart';
+
+export 'setting/others/code/tfa_code.dart';
 
 export 'setting/settings.dart';

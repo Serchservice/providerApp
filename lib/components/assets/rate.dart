@@ -1,47 +1,19 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provide/lib.dart';
 
-class SStarRate extends StatelessWidget {
-  final bool up;
-  final bool down;
-  const SStarRate({super.key, this.up = false, this.down = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: const [
-        Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 16),
-        SizedBox(width: 2),
-        Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 16),
-        SizedBox(width: 2),
-        Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 16),
-        SizedBox(width: 2),
-        Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 16),
-        SizedBox(width: 2),
-        Icon(CupertinoIcons.star_lefthalf_fill, color: SColors.rate, size: 16),
-      ],
-    );
-  }
-}
-
 class RatingTalks extends StatelessWidget {
-  final String image;
-  final String comment;
-  final String name;
-  final Widget rate;
-  final bool good;
-  const RatingTalks({super.key, this.image = "", required this.comment, required this.rate, this.good = false, required this.name});
+  final RatingTalkModel model;
+  final Color? backgroundColor;
+  const RatingTalks({super.key, required this.model, this.backgroundColor});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(12),
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: Theme.of(context).backgroundColor,
+        color: backgroundColor ?? Theme.of(context).backgroundColor,
         borderRadius: BorderRadius.circular(5)
       ),
       child: Row(
@@ -57,16 +29,23 @@ class RatingTalks extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SText(
-                      text: name,
-                      color: Theme.of(context).primaryColorLight,
-                      size: 16
+                    Expanded(
+                      child: SText(
+                        text: model.name,
+                        color: Theme.of(context).primaryColorLight,
+                        size: 16
+                      ),
                     ),
-                    rate
+                    RatingBarIndicator(
+                      rating: model.rate,
+                      itemBuilder: (context, index) => const Icon(Icons.star, color: Colors.amber),
+                      itemCount: 5,
+                      itemSize: 15.0,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 1),
-                SText(text: comment, color: SColors.hint, size: 16),
+                model.comment != null ? SText(text: model.comment!, color: SColors.hint, size: 16) : Container(),
               ],
             ),
           ),

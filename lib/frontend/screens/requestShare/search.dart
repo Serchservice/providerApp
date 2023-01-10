@@ -43,19 +43,23 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void getSuggestion(String searchAddress) async {
-    if(searchAddress.length > 1){
-      String mapUrl = "https://maps.googleapis.com/maps/api/place/autocomplete/json";
-      String request = "$mapUrl?input=$searchAddress&key=$googleMapApiKey&sessiontoken=$_sessionToken";
+    try {
+      if(searchAddress.length > 1){
+        String mapUrl = "https://maps.googleapis.com/maps/api/place/autocomplete/json";
+        String request = "$mapUrl?input=$searchAddress&key=$googleMapApiKey&sessiontoken=$_sessionToken";
 
-      var response = await http.get(Uri.parse(request));
+        var response = await http.get(Uri.parse(request));
 
-      if(response.statusCode == 200){
-        setState(() {
-          _listPlaces = jsonDecode(response.body.toString())['predictions'];
-        });
-      } else {
-        throw Exception("failed");
+        if(response.statusCode == 200){
+          setState(() {
+            _listPlaces = jsonDecode(response.body.toString())['predictions'];
+          });
+        } else {
+          throw Exception("failed");
+        }
       }
+    } catch (e) {
+      debugShow(e);
     }
   }
 
@@ -121,6 +125,7 @@ class _SearchScreenState extends State<SearchScreen> {
       address.placeName = jsonDecode(response.body.toString())["result"]["name"];
 
       Provider.of<UserMapInformation>(context, listen: false).updateServiceLocation(address);
+      confirmIncomingProviderShareRequest(context: context, providerName: "Evaristus");
       // Get.to(() => OnlineProviderList(
       //   title: widget.selected,
       //   location: address.placeFormattedAddress!,
@@ -287,6 +292,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       SButton(
                         text: "Search",
                         textSize: 16,
+                        padding: const EdgeInsets.all(12),
                         textWeight: FontWeight.bold,
                         onClick: () => searchProvidersWithServiceLocation(locationTextControl.text, context)
                       ),
@@ -303,11 +309,23 @@ class _SearchScreenState extends State<SearchScreen> {
                   physics: const ClampingScrollPhysics(),
                   itemCount: _listPlaces.length,
                   separatorBuilder: (context, index) => const Divider(height: 25, thickness: 2,),
-                  itemBuilder: (context, index) => AddressListTile(
-                    onClick: () => searchProvidersWithSuggestion(_listPlaces[index]["place_id"], context),
-                    maintext: _listPlaces[index]["structured_formatting"]["main_text"],
-                    secondarytext: _listPlaces[index]["structured_formatting"]["secondary_text"],
-                  )
+                  itemBuilder: (context, index) {
+                    if(_listPlaces[index]["structured_formatting"]["secondary_text"] == null
+                    || _listPlaces[index]["structured_formatting"]["main_text"] == null){
+                      return Center(
+                        child: SText(
+                          text: "Couldn't find the address you are looking for",
+                          color: Theme.of(context).primaryColorLight,
+                          size: 16,
+                        ),
+                      );
+                    }
+                    return AddressListTile(
+                      onClick: () => searchProvidersWithSuggestion(_listPlaces[index]["place_id"], context),
+                      maintext: _listPlaces[index]["structured_formatting"]["main_text"],
+                      secondarytext: _listPlaces[index]["structured_formatting"]["secondary_text"],
+                    );
+                  }
                 ),
               ),
           ],

@@ -37,6 +37,6 @@ Color getExtensionColor(extension){
     case MediaExtensions.pdf:
       return Scolors.gold;
     default:
-    return SColors.darkPurp;
+    return SColors.lightPurple;
   }
 }

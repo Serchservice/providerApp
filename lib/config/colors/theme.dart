@@ -34,10 +34,10 @@ abstract class STheme{
     colorScheme: const ColorScheme.dark(),
     visualDensity: visualDensity,
     textTheme: GoogleFonts.dmSansTextTheme().apply(bodyColor: SColors.white),
-    scaffoldBackgroundColor: SColors.darkTheme,
+    scaffoldBackgroundColor: SColors.darkTheme1,
     iconTheme: const IconThemeData(color: SColors.dark),
-    bottomAppBarColor: SColors.darkColor,
-    appBarTheme: const AppBarTheme(color: SColors.darkColor),
+    bottomAppBarColor: SColors.darked,
+    appBarTheme: const AppBarTheme(color: SColors.darked),
     primaryColor: SColors.lightTheme,
     hoverColor: SColors.light,
     canvasColor: SColors.white,
@@ -48,7 +48,7 @@ abstract class STheme{
 
     primaryColorDark: SColors.lightPurp,
     cardColor: SColors.enabledBorderDark,
-    backgroundColor: SColors.darkTheme1,
+    backgroundColor: SColors.darkTheme2,
     disabledColor: SColors.disabledDark,
     indicatorColor: SColors.aqua
   );

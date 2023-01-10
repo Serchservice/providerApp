@@ -57,7 +57,8 @@ class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver, Ti
               //   WLAuth().signOut();
               // }
             },
-            color: Theme.of(context).scaffoldBackgroundColor,
+            elevation: 0,
+            color: Theme.of(context).backgroundColor,
             icon: Icon(
               CupertinoIcons.ellipsis_vertical,
               size: 20,

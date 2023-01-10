@@ -11,84 +11,183 @@ class AllPermissions extends StatefulWidget {
 }
 
 class _AllPermissionsState extends State<AllPermissions> {
-  bool locationBool = true;
-  String locationText(){
-    if(locationBool == false){return "off";}
-    else{return "on";}
+  bool location = true;
+  Future<bool> getLocationPermit() async {
+    if(await Permission.location.isGranted){
+      setState(() => location = true);
+      return true;
+    } else {
+      setState(() => location = false);
+      return false;
+    }
   }
 
-  bool? audioBool;
-  String audioText(){
-    if(audioBool == false){return "off";}
-    else{return "on";}
+  bool storage = false;
+  Future<bool> getStoragePermit() async {
+    if(await Permission.storage.isGranted){
+      setState(() => storage = true);
+      return true;
+    } else {
+      setState(() => storage = false);
+      return false;
+    }
   }
 
-  void toogleAudio() async {}
-
-  bool cameraBool = false;
-  String cameraText(){
-    if(cameraBool == false){return "off";}
-    else{return "on";}
+  bool audio = false;
+  Future<bool> getAudioPermit() async {
+    if(await Permission.microphone.isGranted){
+      setState(() => audio = true);
+      return true;
+    } else {
+      setState(() => audio = false);
+      return false;
+    }
   }
 
-  void toogleCamera() async {}
-
-  bool? fileBool = false;
-  String fileText(){
-    if(fileBool == false){return "off";}
-    else{return "on";}
+  bool camera = false;
+  Future<bool> getCameraPermit() async {
+    if(await Permission.camera.isGranted){
+      setState(() => camera = true);
+      return true;
+    } else {
+      setState(() => camera = false);
+      return false;
+    }
   }
 
-  void toogleFile() async {}
+  bool phone = false;
+  Future<bool> getPhonePermit() async {
+    if(await Permission.phone.isGranted){
+      setState(() => phone = true);
+      return true;
+    } else {
+      setState(() => phone = false);
+      return false;
+    }
+  }
+
+  // bool callLog = false;
+  // Future<bool> getCallLogPermit() async {
+  //   if(await Permission.audio.isGranted){
+  //     setState(() => callLog = true);
+  //     return true;
+  //   } else {
+  //     setState(() => callLog = false);
+  //     return false;
+  //   }
+  // }
+
+  bool notification = false;
+  Future<bool> getNotificationPermit() async {
+    if(await Permission.notification.isGranted){
+      setState(() => notification = true);
+      return true;
+    } else {
+      setState(() => notification = false);
+      return false;
+    }
+  }
+
+  void initPermissions() async {
+    await getCameraPermit();
+    await getAudioPermit();
+    await getStoragePermit();
+    await getLocationPermit();
+    // await getCallLogPermit();
+    await getPhonePermit();
+    await getNotificationPermit();
+  }
+
+  @override
+  void initState() {
+    initPermissions();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         SetTab(
-          onPressed: () => UserSharedPermits().changeLocationPermit(),
-          settingHeader: "Turn ${locationText()} location permission.",
+          settingHeader: "Location permission",
+          settingDetail: location ? "Enabled" : "Disabled",
           widget: Container(
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: UserSharedPermits().isLocationGranted() ? SColors.green : SColors.hint
+              color: location ? SColors.green : SColors.hint
             ),
           )
         ),
         const SizedBox(height: 10,),
         SetTab(
-          onPressed: () => toogleFile(),
-          settingHeader: "Turn ${fileText()} file access permission.",
+          settingHeader: "Storage access permission",
+          settingDetail: storage ? "Enabled" : "Disabled",
           widget: Container(
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: fileBool == true ? SColors.green : SColors.hint
+              color: storage ? SColors.green : SColors.hint
             ),
           )
         ),
         const SizedBox(height: 10,),
         SetTab(
-          onPressed: () => toogleAudio(),
-          settingHeader: "Turn ${audioText()} audio permission.",
+          settingHeader: "Microphone permission",
+          settingDetail: audio ? "Enabled" : "Disabled",
           widget: Container(
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: audioBool == true ? SColors.green : SColors.hint
+              color: audio == true ? SColors.green : SColors.hint
             ),
           )
         ),
         const SizedBox(height: 10,),
         SetTab(
-          onPressed: () => toogleCamera(),
-          settingHeader: "Turn ${cameraText()} camera permission.",
+          settingHeader: "Camera permission",
+          settingDetail: camera ? "Enabled" : "Disabled",
           widget: Container(
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: cameraBool == true ? SColors.green : SColors.hint
+              color: camera ? SColors.green : SColors.hint
+            ),
+          )
+        ),
+        const SizedBox(height: 10,),
+        SetTab(
+          settingHeader: "Phone permission",
+          settingDetail: phone ? "Enabled" : "Disabled",
+          widget: Container(
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: phone ? SColors.green : SColors.hint
+            ),
+          )
+        ),
+        const SizedBox(height: 10,),
+        // SetTab(
+        //   settingHeader: "Call log permission",
+        //   settingDetail: callLog ? "Enabled" : "Disabled",
+        //   widget: Container(
+        //     padding: const EdgeInsets.all(5),
+        //     decoration: BoxDecoration(
+        //       shape: BoxShape.circle,
+        //       color: callLog ? SColors.green : SColors.hint
+        //     ),
+        //   )
+        // ),
+        // const SizedBox(height: 10,),
+        SetTab(
+          settingHeader: "Notification permission",
+          settingDetail: notification ? "Enabled" : "Disabled",
+          widget: Container(
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: notification ? SColors.green : SColors.hint
             ),
           )
         ),

@@ -10,12 +10,15 @@ final Uri launchTwitter = Uri(scheme: "https", host: "www.twitter.com", path: "s
 
 final Uri launchYoutube = Uri(scheme: "https", host: "www.youtube.com", path: "@serchservice/");
 
+final Uri launchTikTok = Uri(scheme: "https", host: "www.tiktok.com", path: "@serchservice/");
 
 final Uri launchSignIn = Uri(scheme: "https", host: "www.serchservice.com", path: "/");
 
 final Uri launchSignUp = Uri(scheme: "https", host: "www.serchservice.com", path: "/");
 
 final Uri launchPlans = Uri(scheme: "https", host: "www.serchservice.com", path: "/");
+
+final Uri launchDiscord = Uri(scheme: "https", host: "discord.gg", path: "discord.gg");
 
 final Uri launchLocation = Uri(scheme: "https", host: "www.serchservice.com", path: "/");
 

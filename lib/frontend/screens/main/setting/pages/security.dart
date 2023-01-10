@@ -12,25 +12,17 @@ class SecuritySettingScreen extends StatefulWidget {
 
 class _SecuritySettingScreenState extends State<SecuritySettingScreen> {
   bool secured = false;
-  String bio(){
-    if(UserSharedPermits().getBiometrics()){
-      return "Enabled";
-    } else {
-      return "Disabled";
-    }
-  }
-
   void toogleBiometrics() async {
-    final bioStatus = UserSharedPermits().getBiometrics();
+    final bioStatus = UserPreferences().getBiometrics();
     if(bioStatus == false){
       final status = await Biometrics.authenticate();
       if(status){
         setState(() => secured = true);
-        UserSharedPermits().saveBiometricsMode(PermitModel(hasBiometrics: secured));
+        UserPreferences().saveBiometrics(secured);
         showGetSnackbar(message: "You have biometrics as a security system now", type: Popup.success);
       } else {
         setState(() => secured = false);
-        UserSharedPermits().saveBiometricsMode(PermitModel(hasBiometrics: secured));
+        UserPreferences().saveBiometrics(secured);
         showGetSnackbar(message: "We failed to get your biometrics. Try again please.", type: Popup.error);
       }
     } else {
@@ -39,29 +31,21 @@ class _SecuritySettingScreenState extends State<SecuritySettingScreen> {
         final status = await Biometrics.auth.stopAuthentication();
         if(status){
           setState(() => secured = false);
-          UserSharedPermits().saveBiometricsMode(PermitModel(hasBiometrics: secured));
+          UserPreferences().saveBiometrics(secured);
           showGetSnackbar(message: "You have deactivated biometrics as a security system now", type: Popup.success);
         } else {
           setState(() => secured = true);
-          UserSharedPermits().saveBiometricsMode(PermitModel(hasBiometrics: secured));
+          UserPreferences().saveBiometrics(secured);
           showGetSnackbar(message: "We failed to deactivate your biometrics. Try again please.", type: Popup.error);
         }
       } else {
         setState(() => secured = true);
-        UserSharedPermits().saveBiometricsMode(PermitModel(hasBiometrics: secured));
+        UserPreferences().saveBiometrics(secured);
         showGetSnackbar(message: "We failed to confirm your biometrics. Try again please.", type: Popup.error);
       }
     }
   }
 
-  bool emailLogin = false;
-  String email(){
-    if(UserSharedPermits().getEmailSecure() == true){
-      return "Enabled";
-    } else {
-      return "Disabled";
-    }
-  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,7 +60,7 @@ class _SecuritySettingScreenState extends State<SecuritySettingScreen> {
               color: Theme.of(context).primaryColorLight
             ),
             leading: IconButton(
-              onPressed: () => Get.back(),
+              onPressed: () => Get.offAll(() => const BottomNavigator(newPage: 3)),
               icon: Icon(
                 CupertinoIcons.chevron_back,
                 color: Theme.of(context).primaryColorLight,
@@ -94,35 +78,51 @@ class _SecuritySettingScreenState extends State<SecuritySettingScreen> {
                     prefixIcon: Icons.fingerprint_rounded,
                     onPressed: () => toogleBiometrics(),
                     settingHeader: "Biometrics Authentication",
-                    settingDetail: bio(),
+                    settingDetail: UserPreferences().getBiometrics() ? "Enabled" : "Disabled",
                     widget: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: UserSharedPermits().getBiometrics() ? SColors.green : SColors.hint
+                        color: UserPreferences().getBiometrics() ? SColors.green : SColors.hint
                       ),
                     )
                   ),
-                  const SizedBox(height: 10),
-                  SetTab(
-                    onPressed: () => {},
-                    prefixIcon: Icons.fingerprint_rounded,
-                    settingHeader: "Always log in with email",
-                    settingDetail: email(),
-                    widget: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: UserSharedPermits().getEmailSecure() ? SColors.green : SColors.hint
-                      ),
-                    )
-                  ),
+                  // const SizedBox(height: 10),
+                  // SetTab(
+                  //   onPressed: () => {},
+                  //   prefixIcon: Icons.fingerprint_rounded,
+                  //   settingHeader: "Always log in with email",
+                  //   settingDetail: email(),
+                  //   widget: Container(
+                  //     padding: const EdgeInsets.all(8),
+                  //     decoration: BoxDecoration(
+                  //       shape: BoxShape.circle,
+                  //       color: UserSharedPermits().getEmailSecure() ? SColors.green : SColors.hint
+                  //     ),
+                  //   )
+                  // ),
                   const SizedBox(height: 10),
                   SetTab(
                     settingHeader: "Change Password",
                     settingDetail: "Change your password to a different one.",
                     prefixIcon: CupertinoIcons.padlock,
                     onPressed: () => Get.to(() => const ChangePasswordScreen())
+                  ),
+                  const SizedBox(height: 10),
+                  SetTab(
+                    settingHeader: "Two-step verification",
+                    settingDetail: UserPreferences().getTFA() ? "Enabled" : "Disabled",
+                    prefixIcon: CupertinoIcons.padlock,
+                    onPressed: () {
+                      UserPreferences().getTFA() ? Get.to(() => const HasTFAScreen()) : Get.to(() => const TFAScreen());
+                    },
+                    widget: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: UserPreferences().getTFA() ? SColors.green : SColors.hint
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 40),
                 ],

@@ -27,7 +27,7 @@ class SFormField extends StatelessWidget {
     super.key, this.labelText, this.controller, this.enabled, this.obscureText = false, this.validate, this.prefixIcon, this.onChanged,
     this.onPressed, this.icon, this.inputAction = TextInputAction.next, this.keyboard, required this.formName, this.suffixIcon,
     this.cursorColor, this.fillColor, this.enabledBorderColor = SColors.white, required this.formStyle, this.formColor = SColors.white,
-    this.suffixColor, this.prefixColor, this.focus,
+    this.suffixColor, this.prefixColor, this.focus
   });
   SFormField.password({
     super.key, this.labelText, this.controller, this.enabled, this.obscureText = false, this.validate, this.prefixIcon,

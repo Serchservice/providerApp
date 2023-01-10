@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 import 'package:provide/lib.dart';
 
 class DateLabel extends StatelessWidget {
-  const DateLabel({super.key, required this.label, });
-  final String label;
+  const DateLabel({super.key, required this.model, });
+  final MessageModel model;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class DateLabel extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12),
             child: Text(
-              label,
+              model.dateLabel!,
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
@@ -44,6 +44,8 @@ class ChatAppBar extends StatefulWidget {
 
 class _ChatAppBarState extends State<ChatAppBar> {
   bool ctg = true;
+  bool scheduled = false;
+  final schedule = UserScheduledListModel(scheduledImage: SImages.user, scheduledTime: "10.00am");
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -93,9 +95,9 @@ class _ChatAppBarState extends State<ChatAppBar> {
         actions: [
           const SizedBox(width: 14),
           InkWell(
-            onTap: () {},
+            onTap: () => setState(() => ctg = !ctg),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(12.0),
               child: Icon(
                 CupertinoIcons.rocket_fill,
                 color: ctg ? SColors.green : Theme.of(context).primaryColorLight,
@@ -103,76 +105,8 @@ class _ChatAppBarState extends State<ChatAppBar> {
               ),
             )
           ),
-          PopupMenuButton<UserChatMenu>(
-            onSelected: (value) {
-              switch (value) {
-                case UserChatMenu.voiceCall:
-                  Get.to(() => const VoiceCallScreen());
-                  return;
-                case UserChatMenu.videoCall:
-                  Get.to(() => const VideoCallScreen());
-                  return;
-                case UserChatMenu.schedule:
-
-                case UserChatMenu.pft:
-                  break;
-                default:
-              }
-            },
-            elevation: 0,
-            color: Theme.of(context).backgroundColor,
-            icon: Icon(
-              CupertinoIcons.ellipsis_vertical,
-              size: 20,
-              color: Theme.of(context).primaryColorLight
-            ),
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: UserChatMenu.voiceCall,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(CupertinoIcons.phone_fill, color: Theme.of(context).primaryColorLight),
-                    const SizedBox(width: 5),
-                    SText(text: "Voice Call", color: Theme.of(context).primaryColorLight, weight: FontWeight.bold),
-                  ],
-                )
-              ),
-              PopupMenuItem(
-                value: UserChatMenu.videoCall,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(CupertinoIcons.video_camera_solid, color: Theme.of(context).primaryColorLight),
-                    const SizedBox(width: 5),
-                    SText(text: "Video Call", color: Theme.of(context).primaryColorLight, weight: FontWeight.bold),
-                  ],
-                )
-              ),
-              PopupMenuItem(
-                value: UserChatMenu.schedule,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(CupertinoIcons.calendar_badge_plus, color: Theme.of(context).primaryColorLight),
-                    const SizedBox(width: 5),
-                    SText(text: "Schedule service trip", color: Theme.of(context).primaryColorLight, weight: FontWeight.bold),
-                  ],
-                )
-              ),
-              PopupMenuItem(
-                value: UserChatMenu.pft,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.stream, color: Theme.of(context).primaryColorLight),
-                    const SizedBox(width: 5),
-                    SText(text: "Tip-to-fix", color: Theme.of(context).primaryColorLight, weight: FontWeight.bold),
-                  ],
-                )
-              )
-            ]
-          )
+          if(scheduled)
+          ScheduledBox(user: schedule)
         ],
       ),
     );

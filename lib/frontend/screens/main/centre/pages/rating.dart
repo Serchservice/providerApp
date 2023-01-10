@@ -35,43 +35,35 @@ class _RatingScreenState extends State<RatingScreen> with WidgetsBindingObserver
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar.large(
-            elevation: 0.5,
-            leading: IconButton(
-              onPressed: () => Get.back(),
-              icon: Icon(
-                CupertinoIcons.chevron_back,
-                color: Theme.of(context).primaryColorLight,
-                size: 28
-              )
-            ),
-            title: SText(
-              text: "Ratings",
-              color: Theme.of(context).primaryColorLight,
-              size: 30,
-              weight: FontWeight.bold
-            ),
-            expandedHeight: 300,
-            bottom: PreferredSize(
-              preferredSize: Size(MediaQuery.of(context).size.width, 80),
-              child: SRatingTab(onItemSelected: onNavigationItemSelected),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: screenPadding,
-              child: ValueListenableBuilder(
-                valueListenable: widget.pageIndex,
-                builder: (BuildContext context, int value, _) {
-                  return rating[value];
-                },
-              )
-            ),
-          ),
-        ],
-      )
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => Get.back(),
+          icon: Icon(
+            CupertinoIcons.chevron_back,
+            color: Theme.of(context).primaryColorLight,
+            size: 28
+          )
+        ),
+        title: SText(
+          text: "Ratings",
+          color: Theme.of(context).primaryColorLight,
+          size: 20,
+          weight: FontWeight.bold
+        ),
+        bottom: PreferredSize(
+          preferredSize: Size(MediaQuery.of(context).size.width, 80),
+          child: SRatingTab(onItemSelected: onNavigationItemSelected),
+        ),
+      ),
+      body: Padding(
+        padding: screenPadding,
+        child: ValueListenableBuilder(
+          valueListenable: widget.pageIndex,
+          builder: (BuildContext context, int value, _) {
+            return rating[value];
+          },
+        )
+      ),
     );
   }
 }

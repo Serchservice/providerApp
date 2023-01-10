@@ -1,197 +1,174 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provide/lib.dart';
-import 'package:timeline_tile/timeline_tile.dart';
+import 'package:pretty_qr_code/pretty_qr_code.dart';
+
+class ReferModelBox extends StatelessWidget {
+  final ReferModel model;
+  const ReferModelBox({super.key, required this.model});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(4),
+        color: Theme.of(context).backgroundColor,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if(model.referredPicture == null)
+              CircleAvatar(
+                backgroundColor: SColors.lightPurple,
+                radius: 20,
+                child: SText(
+                  text: "${model.referredFirstName.substring(0, 1)}${model.referredLastName.substring(0, 1)}",
+                  color: SColors.white, size: 18
+                ),
+              )
+              else
+              CircleAvatar(
+                foregroundImage: AssetImage(model.referredPicture!),
+                backgroundColor: SColors.lightPurple,
+                radius: 20,
+              ),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SText(
+                    text: "${model.referredFirstName} ${model.referredLastName}",
+                    color: Theme.of(context).primaryColorLight, size: 18
+                  ),
+                  const SizedBox(width: 15),
+                  SText(
+                    text: model.referredStatus ? "Activated" : "Pending",
+                    color: Theme.of(context).primaryColorLight, size: 14
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Icon(
+            model.referredStatus ? Icons.check_circle : Icons.access_time,
+            size: 24, color: model.referredStatus ? Scolors.success : Scolors.silver ,
+          )
+        ],
+      ),
+    );
+  }
+}
 
 class ReferTree extends StatefulWidget {
-  const ReferTree({super.key});
+  final String referLink;
+  const ReferTree({super.key, required this.referLink});
 
   @override
   State<ReferTree> createState() => _ReferTreeState();
 }
 
 class _ReferTreeState extends State<ReferTree> {
-  //TimeLine Package
-  List<ReferStep>? steps;
-
-  @override
-  void initState() {
-    super.initState();
-    steps = referGenerate();
-  }
-
-  List<ReferStep> referGenerate() {
-    return <ReferStep>[
-      ReferStep(step: 1, referredName: "Evaristus Adims", referredPicture: SImages.barb),
-      ReferStep(step: 2, referredName: "Evaristus Adims", referredPicture: SImages.barb),
-      ReferStep(step: 3, referredName: "Evaristus Adims", referredPicture: SImages.barb),
-      ReferStep(step: 4, referredName: "Evaristus Adims", referredPicture: SImages.barb),
-    ];
-  }
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xffCCCCA9),
-            Color(0xffFFA578),
-          ],
-        )
-      ),
-      child: Scaffold(
-        body: Center(
-          child: Column(
-            children: [
-              Header(),
-              Expanded(
-                child: CustomScrollView(
-                  slivers: [
-                    TimelineSteps(steps: steps!)
-                  ],
-                )
-              )
-            ],
-          )
-        ),
-      )
-    );
-  }
-}
-
-class TimelineSteps extends StatelessWidget {
-  final List<ReferStep> steps;
-  const TimelineSteps({super.key, required this.steps});
+  List<ReferModel> referList = [
+    ReferModel(referredFirstName: "Evaristus", referredLastName: "Adims", referredPicture: SImages.barb, referredStatus: false),
+    ReferModel(referredFirstName: "Evaristus", referredLastName: "Adims", referredStatus: true),
+    ReferModel(referredFirstName: "Evaristus", referredLastName: "Adims", referredPicture: SImages.barb, referredStatus: false),
+    ReferModel(referredFirstName: "Evaristus", referredLastName: "Adims", referredStatus: false),
+    ReferModel(referredFirstName: "Evaristus", referredLastName: "Adims", referredPicture: SImages.barb, referredStatus: true),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (BuildContext context, int index) {
-          if(index.isOdd){
-            return TimelineDivider(
-              color: Theme.of(context).primaryColorDark,
-              thickness: 5,
-              begin: 0.1,
-              end: 0.9,
-            );
-          }
-          final int itemIndex = index ~/ 2;
-          final ReferStep step = steps[itemIndex];
-          final bool isLeftAlign = itemIndex.isEven;
-          final child = TimelineStepsChild(
-            name: step.referredName,
-            picture: step.referredPicture,
-            isLeftAlign: isLeftAlign,
-          );
-          final isFirst = itemIndex == 0;
-          final isLast = itemIndex == steps.length - 1;
-          double indicatorY;
-          if(isFirst){
-            indicatorY = 0.2;
-          } else if(isLast){
-            indicatorY = 0.8;
-          } else {
-            indicatorY = 0.5;
-          }
-          return TimelineTile(
-            alignment: TimelineAlign.manual,
-            endChild: isLeftAlign ? child : null,
-            startChild: isLeftAlign ? null : child,
-            lineXY: isLeftAlign ? 0.5 : 0.5,
-            isFirst: isFirst,
-            isLast: isLast,
-            indicatorStyle: IndicatorStyle(
-              width: 40,
-              height: 40,
-              indicatorXY: indicatorY,
-              indicator: TimelineStepIndicator(step: '${step.step}'),
-            ),
-            beforeLineStyle: LineStyle(color: Theme.of(context).primaryColorDark, thickness: 5),
-          );
-        },
-        childCount: max(0, steps.length * 2 - 1),
-      )
-    );
-  }
-}
-
-class TimelineStepIndicator extends StatelessWidget {
-  final String step;
-  const TimelineStepIndicator({super.key, required this.step});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Theme.of(context).primaryColorDark
-        // color: Color(0xffCB8421)
-      ),
-      child: Center(
-        child: SText(text: step, color: SColors.white, size: 18, weight: FontWeight.bold,)
-      ),
-    );
-  }
-}
-
-class TimelineStepsChild extends StatelessWidget {
-  final String name;
-  final String picture;
-  final bool isLeftAlign;
-  const TimelineStepsChild({super.key, required this.name, required this.picture, required this.isLeftAlign});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: isLeftAlign ? const EdgeInsets.only(right: 32, top: 6, bottom: 6, left: 10)
-      : const EdgeInsets.only(left: 32, top: 6, bottom: 6, right: 10),
+    return Center(
       child: Column(
-        crossAxisAlignment: isLeftAlign ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset(picture, width: 30),
-          const SizedBox(height: 16),
-          Text(
-            name,
-            textAlign: isLeftAlign ? TextAlign.right : TextAlign.left,
-            style: GoogleFonts.acme(
-              fontSize: 22, color: const Color(0xffB96320), fontWeight: FontWeight.bold,
+          Container(
+            padding: const EdgeInsets.all(8),
+            color: Theme.of(context).appBarTheme.backgroundColor,
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Avatar(radius: 40),
+                    const SizedBox(width: 30),
+                    SizedBox(
+                      width: 100, height: 100,
+                      child: PrettyQr(
+                        typeNumber: 3,
+                        size: 200,
+                        data: widget.referLink,
+                        errorCorrectLevel: QrErrorCorrectLevel.M,
+                        roundEdges: true,
+                        elementColor: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(40),
+                    color: Theme.of(context).backgroundColor,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SText(
+                        text: widget.referLink, color: SColors.blue,
+                        size: 16, weight: FontWeight.bold,
+                        decoration: TextDecoration.underline,
+                      ),
+                      const SizedBox(width: 10),
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => copy(widget.referLink),
+                          child: Container(
+                            padding: const EdgeInsets.all(8.0),
+                            margin: const EdgeInsets.symmetric(vertical: 4),
+                            child: const Icon(
+                              Icons.copy_rounded,
+                              color: SColors.hint,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
             )
           ),
-        ]
-      )
-    );
-  }
-}
-
-class Header extends StatelessWidget {
-  const Header({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
-      child: Row(
-        children: [
+          if(referList.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 200.0),
+            child: Center(
+              child: SText(text: "You have no referrals yet", color: Theme.of(context).primaryColorLight, size: 16),
+            ),
+          )
+          else
           Expanded(
-            child: Text(
-              "Your Referred",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.architectsDaughter(
-                fontSize: 22,
-                color: Colors.white,
-                fontWeight: FontWeight.bold
-              ),
+            child: CustomScrollView(
+              slivers: [
+                SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) => ReferModelBox(model: referList[index]),
+                  childCount: referList.length
+                  )
+                )
+              ],
             )
           )
-        ]
+        ],
       )
     );
   }

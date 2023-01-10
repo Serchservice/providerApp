@@ -106,6 +106,12 @@ class _HomeMapState extends State<HomeMap> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    locatePosition(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
@@ -124,7 +130,6 @@ class _HomeMapState extends State<HomeMap> {
             onMapCreated: (GoogleMapController controller) {
               _controller.complete(controller);
               mapController = controller;
-              locatePosition(context);
 
               //Black theme
               mapController?.setMapStyle('''
@@ -294,7 +299,7 @@ class _HomeMapState extends State<HomeMap> {
           )
         ),
 
-        Provider.of<UserServiceInformation>(context, listen: false).status == "Online"
+        Provider.of<UserServiceInformation>(context, listen: false).model.status == "Online" || UserPreferences().getShowAlwaysOnline()
         ? Container()
         : Container(
           height: widget.height,
@@ -302,7 +307,7 @@ class _HomeMapState extends State<HomeMap> {
           color: Colors.black87
         ),
 
-        Provider.of<UserServiceInformation>(context, listen: false).status == "Online"
+        Provider.of<UserServiceInformation>(context, listen: false).model.status == "Online" || UserPreferences().getShowAlwaysOnline()
         ? Container()
         : Align(
           alignment: Alignment.center,

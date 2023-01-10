@@ -83,6 +83,13 @@ class _HelpSettingScreenState extends State<HelpSettingScreen> {
                   ),
                   const SizedBox(height: 10),
                   SetTab(
+                    settingHeader: "TikTok",
+                    prefixIcon: FontAwesomeIcons.tiktok,
+                    settingDetail: "Follow us on tiktok, watch videos on our products and make comments.",
+                    onPressed: () => launchUniversalLinkIos(launchYoutube)
+                  ),
+                  const SizedBox(height: 10),
+                  SetTab(
                     settingHeader: "Mail",
                     prefixIcon: CupertinoIcons.mail_solid,
                     settingDetail: "Send us an email. We are with you 24 hours of the day.",
@@ -91,9 +98,22 @@ class _HelpSettingScreenState extends State<HelpSettingScreen> {
                   const SizedBox(height: 10),
                   SetTab(
                     settingHeader: "Call Centre",
-                    prefixIcon: FontAwesomeIcons.phone,
+                    prefixIcon: Icons.phone,
                     settingDetail: "Talk to our customer service today. Get all the help you need.",
                     onPressed: () => makePhoneCall(phoneCall)
+                  ),
+                  const SizedBox(height: 10),
+                  SetTab(
+                    settingHeader: "Safe-Guard Community",
+                    prefixIcon: FontAwesomeIcons.helmetSafety,
+                    settingDetail: "Join the SGC family and make your own contributions and suggestions.",
+                    onPressed: () => launchUniversalLinkIos(launchDiscord)
+                  ),
+                  const SizedBox(height: 10),
+                  SetTab(
+                    settingHeader: "App Info",
+                    prefixIcon: Icons.info,
+                    onPressed: () => Get.to(() => const AppInfoScreen())
                   ),
                   const SizedBox(height: 40),
                 ]

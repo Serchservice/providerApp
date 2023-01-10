@@ -110,10 +110,11 @@ class SetTab extends StatelessWidget {
                   children: [
                     SText(
                       text: settingHeader,
-                      size: 16,
-                      weight: FontWeight.bold,
-                      color: Theme.of(context).primaryColorLight
+                      size: 18,
+                      // weight: FontWeight.bold,
+                      color: Theme.of(context).primaryColor
                     ),
+                    const SizedBox(height: 2),
                     if(settingDetail == null)
                     Container()
                     else

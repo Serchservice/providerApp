@@ -9,25 +9,26 @@ class SText extends StatelessWidget {
   final FontStyle style;
   final TextOverflow? flow;
   final Color color;
+  final TextDecoration? decoration;
   const SText({
     super.key, required this.text, this.size = 14, this.weight = FontWeight.normal,
-    this.align = TextAlign.left, this.color = SColors.white, this.flow, this.style = FontStyle.normal
+    this.align = TextAlign.left, this.color = SColors.white, this.flow, this.style = FontStyle.normal, this.decoration
   });
   const SText.justify({
     super.key, required this.text, this.size = 14, this.weight = FontWeight.normal, this.color = SColors.white, this.flow,
-    this.style = FontStyle.normal
+    this.style = FontStyle.normal, this.decoration
   }) : align = TextAlign.justify;
   const SText.right({
     super.key, required this.text, this.size = 14, this.weight = FontWeight.normal, this.color = SColors.white, this.flow,
-    this.style = FontStyle.normal
+    this.style = FontStyle.normal, this.decoration
   }) : align = TextAlign.right;
   const SText.center({
     super.key, required this.text, this.size = 14, this.weight = FontWeight.normal, this.color = SColors.white, this.flow,
-    this.style = FontStyle.normal
+    this.style = FontStyle.normal, this.decoration
   }) : align = TextAlign.center;
   const SText.theme({
     super.key, required this.text, this.size = 14, this.weight = FontWeight.normal, this.align = TextAlign.center, required this.color,
-    this.flow, this.style = FontStyle.normal
+    this.flow, this.style = FontStyle.normal, this.decoration
   });
 
   @override
@@ -41,6 +42,7 @@ class SText extends StatelessWidget {
         fontSize: size,
         fontWeight: weight,
         fontStyle: style,
+        decoration: decoration
       ),
     );
   }

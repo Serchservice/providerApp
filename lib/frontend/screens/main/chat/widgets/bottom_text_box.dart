@@ -6,34 +6,27 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provide/lib.dart';
 
-class PickEmoji extends StatefulWidget {
+class PickEmoji extends StatelessWidget {
   final TextEditingController text;
-  const PickEmoji({super.key, required this.text});
+  final double? height;
 
-  @override
-  State<PickEmoji> createState() => _PickEmojiState();
-}
+  const PickEmoji({super.key, required this.text, this.height});
 
-class _PickEmojiState extends State<PickEmoji> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height / 2.5,
+      height: height,
       child: EmojiPicker(
-        textEditingController: widget.text,
+        textEditingController: text,
         // onEmojiSelected: (category, emoji) {
         //   setState(() {
-        //     widget.text.text = widget.text.text + emoji.emoji;
+        //     text.text = text.text + emoji.emoji;
         //   });
         // },
         config: Config(
           columns: 7,
           // Issue: https://github.com/flutter/flutter/issues/28894
-          emojiSizeMax: 32 *
-              (foundation.defaultTargetPlatform ==
-                      TargetPlatform.iOS
-                  ? 1.30
-                  : 1.0),
+          emojiSizeMax: 32 * (foundation.defaultTargetPlatform == TargetPlatform.iOS ? 1.30 : 1.0),
           verticalSpacing: 0,
           horizontalSpacing: 0,
           gridPadding: EdgeInsets.zero,
@@ -67,12 +60,13 @@ class _PickEmojiState extends State<PickEmoji> {
 
 showMore(context) => showModalBottomSheet(
   context: context,
+  barrierColor: Colors.transparent,
   backgroundColor: Colors.transparent,
+  elevation: 0,
   builder: (context) => StatefulBuilder(
     builder: (context, setState) => Padding(
       padding: const EdgeInsets.only(bottom: 60.0),
       child: SizedBox(
-        height: 250,
         width: MediaQuery.of(context).size.width,
         child: Card(
           color: Theme.of(context).backgroundColor,
@@ -116,15 +110,6 @@ showMore(context) => showModalBottomSheet(
                   ),
                   color: SColors.aries,
                   text: "Audio"
-                ),
-                SIconTextButton(
-                  icon: Icons.contact_phone_rounded,
-                  onClick: () => pickFile(
-                    context: context, type: FileType.media,
-                    allowMultiple: true,
-                  ),
-                  color: SColors.blue,
-                  text: "Contact"
                 ),
               ]
             ),

@@ -95,15 +95,15 @@ class UserMapInformation extends ChangeNotifier {
 }
 
 class UserServiceInformation extends ChangeNotifier{
-  String? service; String status = "Offline";
+  UserServiceModel model = UserServiceModel();
 
   void updateStatus({required String newStatus}){
-    status = newStatus;
+    model.status = newStatus;
     notifyListeners();
   }
 
   void updateService({required String newService}){
-    service = newService;
+    model.service = newService;
     notifyListeners();
   }
 }

@@ -48,11 +48,12 @@ class _CallHistoryScreenState extends State<CallHistoryScreen> with WidgetsBindi
         ),
         actions: [
           IconButton(
-            onPressed: (){},
-            icon: Icon(CupertinoIcons.bookmark, color: Theme.of(context).primaryColorLight),
-          ),
-          IconButton(
-            onPressed: (){},
+            onPressed: () => deleteUser(
+              context: context,
+              onClick: () {
+                Get.offUntil(GetPageRoute(page: () => const BottomNavigator(newPage: 2)), (route) => false);
+              }
+            ),
             icon: Icon(CupertinoIcons.delete, color: Theme.of(context).primaryColorLight),
           ),
         ],
@@ -64,14 +65,7 @@ class _CallHistoryScreenState extends State<CallHistoryScreen> with WidgetsBindi
             sliver: SliverToBoxAdapter(
               child: Column(
                 children: [
-                  const CHH(good: true,),
-                  const SizedBox(height: 10),
-                  CHHButtons(
-                    voiceClick: () {},
-                    videoClick: () {},
-                    psClick: () {},
-                    messageClick: () {},
-                  ),
+                  const CHH(),
                   const SizedBox(height: 20),
                 ],
               ),

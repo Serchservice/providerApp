@@ -15,7 +15,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   // DocumentReference? onlineStatus;
-  bool onTrip = false;
   bool location = false;
   bool online = false;
   String status = "Offline";
@@ -34,27 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  cancelTrip(BuildContext context){
-    showCancelReason(
-      context: context,
-      checkList: CheckBoxListModel(
-        reason: "User's location was not correct",
-        value: location,
-        onChanged:(value) {
-          setState(() => location = value!);
-        },
-      )
-    );
-    // setState(() => onTrip = false);
-  }
-
-  endTrip(BuildContext context){
-    showRatingDialog(context);
-    // setState(() => onTrip = false);
-  }
-
   Future toggleStatus() async {
-    if(Provider.of<UserServiceInformation>(context, listen: false).status == "Online"){
+    if(Provider.of<UserServiceInformation>(context, listen: false).model.status == "Online" || UserPreferences().getShowAlwaysOnline()){
       setState(() => status = "Offline");
       Provider.of<UserServiceInformation>(context, listen: false).updateStatus(newStatus: status);
     } else {
@@ -91,7 +71,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          child: Provider.of<UserServiceInformation>(context, listen: false).status == "Online" ? Material(
+          child: Provider.of<UserServiceInformation>(context, listen: false).model.status == "Online" || UserPreferences().getShowAlwaysOnline()
+          ? Material(
             color: SColors.green,
             child: InkWell(
               onTap: () => toggleStatus(),
@@ -106,16 +87,16 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       extendBodyBehindAppBar: true,
       body: SlidingUpPanel(
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: Theme.of(context).bottomAppBarColor,
         borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-        minHeight: 50.5,
-        maxHeight: onTrip ? 400 : 300,
-        padding: const EdgeInsets.all(10),
-        collapsed: SlideCollapsed(onTrip: onTrip,),
+        minHeight: 80.5,
+        maxHeight: UserConnection().getOnTrip() ? 400 : 300,
+        padding: const EdgeInsets.all(20),
+        collapsed: SlideCollapsed(onTrip: UserConnection().getOnTrip(),),
         panel: SlidePanel(
-          onTrip: onTrip,
-          cancelClick: () => cancelTrip(context),
-          endClick: () => endTrip(context),
+          onTrip: UserConnection().getOnTrip(),
+          cancelClick: () => showCancelReason(context: context),
+          endClick: () => showRatingDialog(context: context, user: "Evaristus Adimonyemma"),
         ),
         body: HomeMap(
           width: width,

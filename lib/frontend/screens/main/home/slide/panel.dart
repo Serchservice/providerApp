@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provide/lib.dart';
 import 'package:provider/provider.dart';
 
@@ -11,7 +12,7 @@ class SlidePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return onTrip ? OnTripCount(
+    return onTrip == false ? OnTripCount(
       cancelClick: cancelClick,
       endClick: endClick,
     ) : const NoTripCount();
@@ -26,19 +27,12 @@ class NoTripCount extends StatefulWidget {
 }
 
 class _NoTripCountState extends State<NoTripCount> {
-
-  @override
-  void initState() {
-    super.initState();
-    SerchUser.getCurrentUserInfo();
-  }
-
   @override
   Widget build(BuildContext context) {
     const trips = "4";
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 0.0),
+        padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -148,12 +142,110 @@ class _NoTripCountState extends State<NoTripCount> {
                 Wrap(
                   children: [
                     SText(text: "Average Rate: ", color: Theme.of(context).primaryColor, size: 16, weight: FontWeight.w600),
-                    const SStarRate()
+                    RatingBarIndicator(
+                      rating: 3,
+                      itemBuilder: (context, index) => const Icon(Icons.star, color: Colors.amber),
+                      itemCount: 5,
+                      itemSize: 15.0,
+                    ),
                   ]
                 ),
               ],
             ),
             const SizedBox(height: 20),
+            if(UserConnection().getOnRequestShare())
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SText(
+                  text: "You were invited by:",
+                  size: 16, weight: FontWeight.bold,
+                  color: Theme.of(context).primaryColorLight
+                ),
+                Container(
+                  padding: const EdgeInsets.all(15.0),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).backgroundColor,
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Picture.medium(),
+                      const SizedBox(width: 10),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SText(
+                            text: "Evaristus Frank-Calvary",
+                            size: 18, weight: FontWeight.bold,
+                            color: Theme.of(context).primaryColorLight
+                          ),
+                          const SizedBox(height: 5),
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            alignment: WrapAlignment.spaceEvenly,
+                            spacing: 20,
+                            children: [
+                              Material(
+                                color: Theme.of(context).backgroundColor,
+                                borderRadius: BorderRadius.circular(4),
+                                child: InkWell(
+                                  onTap: (){},
+                                  child: SIcon(
+                                    icon: CupertinoIcons.phone_fill,
+                                    size: 20,
+                                    iconColor: Theme.of(context).primaryColorDark,
+                                  ),
+                                ),
+                              ),
+                              Material(
+                                color: Theme.of(context).backgroundColor,
+                                borderRadius: BorderRadius.circular(4),
+                                child: InkWell(
+                                  onTap: (){},
+                                  child: SIcon(
+                                    icon: CupertinoIcons.video_camera_solid,
+                                    size: 20,
+                                    iconColor: Theme.of(context).primaryColorDark,
+                                  ),
+                                ),
+                              ),
+                              Material(
+                                color: Theme.of(context).backgroundColor,
+                                borderRadius: BorderRadius.circular(4),
+                                child: InkWell(
+                                  onTap: (){},
+                                  child: SIcon(
+                                    icon: CupertinoIcons.bubble_left_bubble_right_fill,
+                                    size: 20,
+                                    iconColor: Theme.of(context).primaryColorDark,
+                                  ),
+                                ),
+                              ),
+                              Material(
+                                color: Theme.of(context).backgroundColor,
+                                borderRadius: BorderRadius.circular(4),
+                                child: InkWell(
+                                  onTap: (){},
+                                  child: SIcon(
+                                    icon: Icons.cancel,
+                                    size: 20,
+                                    iconColor: Theme.of(context).primaryColorDark,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
             Center(
               child: Container(
                 padding: screenPadding,

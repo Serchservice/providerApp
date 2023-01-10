@@ -1,9 +1,49 @@
 import 'package:provide/lib.dart';
 
 class UserServiceModel{
-  String? service; String status;
+  String? service; String status; bool? hasRequestShare; bool? onRequestShare; bool? onTrip;
 
-  UserServiceModel({this.service, this.status = "Offline"});
+  UserServiceModel({this.service, this.status = "Offline", this.hasRequestShare, this.onRequestShare, this.onTrip});
+
+  static UserServiceModel fromJson(Map<String, dynamic> json) => UserServiceModel(
+    service: json["service"],
+    status: json["status"],
+    hasRequestShare: json["hasRequestShare"],
+    onRequestShare: json["onRequestShare"],
+    onTrip: json["onTrip"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "service": service,
+    "status": status,
+    "hasRequestShare": hasRequestShare,
+    "onRequestShare": onRequestShare,
+    "onTrip": onTrip
+  };
+}
+
+
+class ReferModel{
+  String referredFirstName;
+  String referredLastName;
+  bool referredStatus;
+  String? referredPicture;
+
+  ReferModel({required this.referredFirstName, this.referredPicture, required this.referredStatus, required this.referredLastName});
+
+  static ReferModel fromJson(Map<String, dynamic> json) => ReferModel(
+    referredFirstName: json["referredFirstName"],
+    referredLastName: json["referredLastName"],
+    referredPicture: json["referredPicture"],
+    referredStatus: json["referredStatus"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "referredFirstName": referredFirstName,
+    "referredLastName": referredLastName,
+    "referredPicture": referredPicture,
+    "referredStatus": referredStatus
+  };
 }
 
 class UserScheduledListModel{
@@ -23,14 +63,6 @@ class UserRatingModel{
 class UserMoneyModel{
   double totalEarned;
   UserMoneyModel({this.totalEarned = 0.00});
-}
-
-class ReferStep{
-  final int step;
-  final String referredName;
-  final String referredPicture;
-
-  ReferStep({required this.step, required this.referredName, required this.referredPicture});
 }
 
 class NotificationModel{
@@ -60,13 +92,14 @@ class PermitModel{
   final bool? showAppBadge;
   final bool? emailSecure;
   final bool? photos;
+  final bool? hasTFA;
 
   PermitModel({
     this.audio, this.camera, this.file, this.location, this.theme, this.alwaysOnline, this.callNotify, this.chatNotify,
-    this.hasBiometrics, this.onSWM, this.otherNotify, this.showOnMap, this.showAppBadge, this.emailSecure, this.photos
+    this.hasBiometrics, this.onSWM, this.otherNotify, this.showOnMap, this.showAppBadge, this.emailSecure, this.photos, this.hasTFA
   });
 
-  static PermitModel fromJson(Map<bool, dynamic> json) => PermitModel(
+  static PermitModel fromJson(Map<String, dynamic> json) => PermitModel(
     audio: json["audio"],
     camera: json["camera"],
     file: json["file"],
@@ -81,7 +114,8 @@ class PermitModel{
     onSWM: json["onSWM"],
     showAppBadge: json["showAppBadge"],
     emailSecure: json["emailSecure"],
-    photos: json["photos"]
+    photos: json["photos"],
+    hasTFA: json["hasTFA"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -99,6 +133,7 @@ class PermitModel{
     "onSWM": onSWM,
     "showAppBadge": showAppBadge,
     "emailSecure": emailSecure,
-    "photos": photos
+    "photos": photos,
+    "hasTFA": hasTFA,
   };
 }

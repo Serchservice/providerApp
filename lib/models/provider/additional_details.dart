@@ -8,3 +8,12 @@ class UserAdditionalModel{
     this.nokPhoneNumber, this.nokAddress, this.nokCity, this.nokCountry
   });
 }
+
+class RatingTalkModel{
+  final String image;
+  final String? comment;
+  final String name;
+  final double rate;
+  final bool good;
+  RatingTalkModel({required this.image, this.comment, required this.name, required this.rate, required this.good});
+}

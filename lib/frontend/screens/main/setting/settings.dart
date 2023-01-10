@@ -17,11 +17,11 @@ class _SettingScreenState extends State<SettingScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
+          SliverAppBar.medium(
             title: SText(
               text: "Settings",
               color: Theme.of(context).primaryColor,
-              size: 40,
+              size: 28,
               weight: FontWeight.bold
             ),
             actions: [
@@ -34,7 +34,10 @@ class _SettingScreenState extends State<SettingScreen> {
                 )
               )
             ],
-            expandedHeight: 300,
+            expandedHeight: 200,
+            floating: true,
+            snap: true,
+            pinned: true,
           ),
           SliverPadding(
             padding: screenPadding,
@@ -46,12 +49,12 @@ class _SettingScreenState extends State<SettingScreen> {
                     settingDetail: "Toogle between light and dark theme.",
                     widget: IconButton(
                       onPressed: () {
-                        if(UserSharedPermits().getSavedThemeMode() == true){
+                        if(UserPreferences().getSavedThemeMode() == true){
                           setState(() => theme = false);
-                          UserSharedPermits().changeThemeMode(theme);
+                          UserPreferences().changeThemeMode(theme);
                         } else {
                           setState(() => theme = true);
-                          UserSharedPermits().changeThemeMode(theme);
+                          UserPreferences().changeThemeMode(theme);
                         }
                       },
                       icon: Icon(CupertinoIcons.moon_fill, color: Theme.of(context).primaryColorLight, size: 22)
@@ -60,14 +63,14 @@ class _SettingScreenState extends State<SettingScreen> {
                   ),
                   const SizedBox(height: 10),
                   SetTab(
-                    settingDetail: "Configure your login security and make it more secure.",
+                    settingDetail: "Configure your account security to make it stronger.",
                     prefixIcon: CupertinoIcons.shield,
                     settingHeader: "Security and Login",
                     onPressed: () => Get.to(() => const SecuritySettingScreen())
                   ),
                   const SizedBox(height: 10),
                   SetTab(
-                    settingDetail: "Check out these faqs. You might find what you are looking for.",
+                    settingDetail: "Check out these faqs, you might find what you are looking for.",
                     prefixIcon: CupertinoIcons.doc_on_doc,
                     settingHeader: "Frequently Asked Questions",
                     onPressed: () => Get.to(() => const FAQSettingScreen())
@@ -95,10 +98,17 @@ class _SettingScreenState extends State<SettingScreen> {
                   ),
                   const SizedBox(height: 10),
                   SetTab(
-                    prefixIcon: CupertinoIcons.power,
-                    settingHeader: "Sign Out",
-                    settingDetail: "Log out of Serch app. We would love to see you again.",
-                    onPressed: () => openLogOutAccount(context)
+                    settingDetail: "Network usage, storage location",
+                    prefixIcon: Icons.storage,
+                    settingHeader: "Storage and data",
+                    onPressed: () => Get.to(() => const HelpSettingScreen())
+                  ),
+                  const SizedBox(height: 10),
+                  SetTab(
+                    settingDetail: "(phone's language)",
+                    prefixIcon: Icons.public,
+                    settingHeader: "App Language",
+                    onPressed: () => Get.to(() => const HelpSettingScreen())
                   ),
                   const SizedBox(height: 20),
                 ],
@@ -106,7 +116,7 @@ class _SettingScreenState extends State<SettingScreen> {
             )
           ),
         ],
-      )
+      ),
     );
   }
 }

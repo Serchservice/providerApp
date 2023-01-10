@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provide/lib.dart';
-import 'package:provide/models/provider/transactions.dart';
+import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 
 class Tip2FixWalletScreen extends StatefulWidget {
   final String userAmount;
@@ -32,12 +32,12 @@ class _Tip2FixWalletScreenState extends State<Tip2FixWalletScreen> {
       TransactionModel("12/01/2022", senderName: "Evaristus Adimonyemma", amount: 2000, status: "Received")
     ];
 
-    List<TableRow> tables = [
-      tableHeader(["Name", "Amount", "Date", "Status"], isHeader: true),
-      tableHeader(["Evaristus Adimonyemma", "2,000", "12/01/2022", "Pending"]),
-      tableHeader(["Evaristus Adimonyemma", "3,500", "12/01/2022", "Withdrawn"]),
-      tableHeader(["Evaristus Adimonyemma", "10,000", "12/01/2022", "Received"]),
-    ];
+    // List<TableRow> tables = [
+    //   tableHeader(["Name", "Amount", "Date", "Status"], isHeader: true),
+    //   tableHeader(["Evaristus Adimonyemma", "2,000", "12/01/2022", "Pending"]),
+    //   tableHeader(["Evaristus Adimonyemma", "3,500", "12/01/2022", "Withdrawn"]),
+    //   tableHeader(["Evaristus Adimonyemma", "10,000", "12/01/2022", "Received"]),
+    // ];
 
     return Scaffold(
       body: CustomScrollView(
@@ -55,7 +55,7 @@ class _Tip2FixWalletScreenState extends State<Tip2FixWalletScreen> {
             title: SText(
               text: "My Tip2Fix Earnings",
               color: Theme.of(context).primaryColorLight,
-              size: 30, weight: FontWeight.bold
+              size: 24, weight: FontWeight.bold
             ),
             expandedHeight: 250,
           ),
@@ -469,96 +469,102 @@ addBankAccount({
     context: context,
     enableDrag: false,
     backgroundColor: Colors.transparent,
-    builder: (context) => StatefulBuilder(
-      builder:(context, setState) => Container(
-        padding: screenPadding,
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SText(
-                text: "Provide a bank account in order to process your withdrawals",
-                size: 20,
-                weight: FontWeight.bold,
-                color: Theme.of(context).primaryColor,
-              ),
-              const SizedBox(height: 20),
-              Form(
-                key: formKey,
-                child: Column(
-                  children: [
-                    SFormField(
-                      labelText: "3034584932",
-                      formName: "Account Number",
-                      controller: accountNumber,
-                      cursorColor: Theme.of(context).primaryColor,
-                      fillColor: Theme.of(context).scaffoldBackgroundColor,
-                      formStyle: STexts.normalForm(context),
-                      formColor: Theme.of(context).primaryColor,
-                      enabledBorderColor: Theme.of(context).primaryColor,
-                    ),
-                    SDropDown(
-                      list: gender,
-                      hintText: "Select your bank",
-                      formName: "Bank Name",
-                      onChanged: (value) => setState(() => myBank = value.toString()),
-                      onSaved: (value) => setState(() => myBank = value.toString()),
-                      fillColor: Theme.of(context).scaffoldBackgroundColor,
-                      formColor: Theme.of(context).primaryColor,
-                      enabledBorderColor: Theme.of(context).primaryColor,
-                    ),
-                    if(verified == true)
-                    Column(
-                      children: [
-                        SFormField(
-                          labelText: "Evaristus Adimonyemma",
-                          formName: "Account Name",
-                          enabled: false,
-                          cursorColor: Theme.of(context).primaryColor,
-                          fillColor: Theme.of(context).scaffoldBackgroundColor,
-                          formStyle: STexts.normalForm(context),
-                          formColor: Theme.of(context).primaryColor,
-                        ),
-                        const SizedBox(height: 20)
-                      ],
-                    )
-                    else
-                    const SizedBox(height: 20),
-                    if(verified == true)
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SButton(
-                        text: "Save my bank information",
-                        width: MediaQuery.of(context).size.width,
-                        padding: const EdgeInsets.all(8.0),
-                        textWeight: FontWeight.bold,
-                        textSize: 18,
-                        onClick: () => {},
-                      ),
-                    )
-                    else
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SButton(
-                        text: "Verify Bank Account",
-                        width: MediaQuery.of(context).size.width,
-                        padding: const EdgeInsets.all(8.0),
-                        textWeight: FontWeight.bold,
-                        textSize: 18,
-                        onClick: () => {},
-                      ),
-                    ),
-                  ]
-                )
-              ),
-            ]
+    builder: (context) => KeyboardDismisser(
+      gestures: const [
+        GestureType.onTap,
+        GestureType.onPanUpdateDownDirection,
+      ],
+      child: StatefulBuilder(
+        builder:(context, setState) => Container(
+          padding: screenPadding,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            borderRadius: BorderRadius.circular(10),
           ),
-        ),
-      )
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SText(
+                  text: "Provide a bank account in order to process your withdrawals",
+                  size: 20,
+                  weight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
+                ),
+                const SizedBox(height: 20),
+                Form(
+                  key: formKey,
+                  child: Column(
+                    children: [
+                      SFormField(
+                        labelText: "3034584932",
+                        formName: "Account Number",
+                        controller: accountNumber,
+                        cursorColor: Theme.of(context).primaryColor,
+                        fillColor: Theme.of(context).scaffoldBackgroundColor,
+                        formStyle: STexts.normalForm(context),
+                        formColor: Theme.of(context).primaryColor,
+                        enabledBorderColor: Theme.of(context).primaryColor,
+                      ),
+                      SDropDown(
+                        list: gender,
+                        hintText: "Select your bank",
+                        formName: "Bank Name",
+                        onChanged: (value) => setState(() => myBank = value.toString()),
+                        onSaved: (value) => setState(() => myBank = value.toString()),
+                        fillColor: Theme.of(context).scaffoldBackgroundColor,
+                        formColor: Theme.of(context).primaryColor,
+                        enabledBorderColor: Theme.of(context).primaryColor,
+                      ),
+                      if(verified == true)
+                      Column(
+                        children: [
+                          SFormField(
+                            labelText: "Evaristus Adimonyemma",
+                            formName: "Account Name",
+                            enabled: false,
+                            cursorColor: Theme.of(context).primaryColor,
+                            fillColor: Theme.of(context).scaffoldBackgroundColor,
+                            formStyle: STexts.normalForm(context),
+                            formColor: Theme.of(context).primaryColor,
+                          ),
+                          const SizedBox(height: 20)
+                        ],
+                      )
+                      else
+                      const SizedBox(height: 20),
+                      if(verified == true)
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SButton(
+                          text: "Save my bank information",
+                          width: MediaQuery.of(context).size.width,
+                          padding: const EdgeInsets.all(8.0),
+                          textWeight: FontWeight.bold,
+                          textSize: 18,
+                          onClick: () => {},
+                        ),
+                      )
+                      else
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SButton(
+                          text: "Verify Bank Account",
+                          width: MediaQuery.of(context).size.width,
+                          padding: const EdgeInsets.all(8.0),
+                          textWeight: FontWeight.bold,
+                          textSize: 18,
+                          onClick: () => {},
+                        ),
+                      ),
+                    ]
+                  )
+                ),
+              ]
+            ),
+          ),
+        )
+      ),
     )
   );
 }

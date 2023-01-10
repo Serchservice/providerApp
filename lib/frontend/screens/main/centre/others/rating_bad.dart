@@ -9,63 +9,26 @@ class BadRatingScreen extends StatefulWidget {
 }
 
 class _BadRatingScreenState extends State<BadRatingScreen> {
+  List<RatingTalkModel> ratingList = [
+    RatingTalkModel(image: SImages.barberAvatar, name: "Evaristus Adimonyemma", rate: 4, good: true)
+  ];
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        RatingTalks(
-          comment: "Knows what he is doing and good at his job",
-          name: "Evaristus Adimonyemma",
-          rate: Row(
-            children: const [
-              Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 14),
-              Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 14),
-              Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 14),
-              Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 14),
-              Icon(CupertinoIcons.star_lefthalf_fill, color: SColors.rate, size: 14),
-            ],
-          )
+    return CustomScrollView(
+      slivers: [
+        if(ratingList.isEmpty)
+        const SliverPadding(
+          padding: EdgeInsets.symmetric(vertical: 200),
+          sliver: SliverToBoxAdapter(child: SText.center(text: "You have no rating", color: SColors.hint, size: 24)),
+        )
+        else
+        SliverList(
+          delegate: SliverChildBuilderDelegate(((context, index) {
+            return RatingTalks(model: ratingList[index]);
+          }), childCount: ratingList.length)
         ),
-        RatingTalks(
-          comment: "Knows what he is doing and good at his job",
-          name: "Evaristus Adimonyemma",
-          rate: Row(
-            children: const [
-              Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 14),
-              Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 14),
-              Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 14),
-              Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 14),
-              Icon(CupertinoIcons.star_lefthalf_fill, color: SColors.rate, size: 14),
-            ],
-          )
-        ),
-        RatingTalks(
-          comment: "Knows what he is doing and good at his job",
-          name: "Evaristus Adimonyemma",
-          rate: Row(
-            children: const [
-              Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 14),
-              Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 14),
-              Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 14),
-              Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 14),
-              Icon(CupertinoIcons.star_lefthalf_fill, color: SColors.rate, size: 14),
-            ],
-          )
-        ),
-        RatingTalks(
-          comment: "Knows what he is doing and good at his job",
-          name: "Evaristus Adimonyemma",
-          rate: Row(
-            children: const [
-              Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 14),
-              Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 14),
-              Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 14),
-              Icon(CupertinoIcons.star_fill, color: SColors.rate, size: 14),
-              Icon(CupertinoIcons.star_lefthalf_fill, color: SColors.rate, size: 14),
-            ],
-          )
-        ),
-      ]
+        const SliverToBoxAdapter(child: SizedBox(height: 20))
+      ],
     );
   }
 }

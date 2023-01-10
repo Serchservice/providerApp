@@ -48,11 +48,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> with WidgetsBindi
         ),
         actions: [
           IconButton(
-            onPressed: (){},
-            icon: Icon(CupertinoIcons.bookmark, color: Theme.of(context).primaryColorLight),
-          ),
-          IconButton(
-            onPressed: (){},
+            onPressed: () => deleteUser(
+              context: context,
+              onClick: () {
+                Get.offUntil(GetPageRoute(page: () => const BottomNavigator(newPage: 1)), (route) => false);
+              }
+            ),
             icon: Icon(CupertinoIcons.delete, color: Theme.of(context).primaryColorLight),
           ),
         ],
@@ -64,14 +65,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> with WidgetsBindi
             sliver: SliverToBoxAdapter(
               child: Column(
                 children: [
-                  const CHH(good: true,),
-                  const SizedBox(height: 10),
-                  CHHButtons(
-                    voiceClick: () {},
-                    videoClick: () {},
-                    psClick: () {},
-                    messageClick: () {},
-                  ),
+                  const CHH(),
                   const SizedBox(height: 20),
                 ],
               ),
@@ -84,11 +78,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> with WidgetsBindi
                 color: Theme.of(context).backgroundColor,
                 // borderRadius: const BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50))
               ),
-              child: Column(
-                children: [
-                  SCHTab(onItemSelected: onNavigationItemSelected,),
-                ],
-              )
+              child: SChatTab(onItemSelected: onNavigationItemSelected,)
             ),
           ),
           ValueListenableBuilder(
@@ -101,4 +91,34 @@ class _UserProfileScreenState extends State<UserProfileScreen> with WidgetsBindi
       ),
     );
   }
+}
+
+
+void deleteUser({required BuildContext context, VoidCallback? onClick}) async {
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: SText(text: "Are you sure you want to delete this user?.", color: Theme.of(context).primaryColor, size: 16),
+            actions: [
+              SBtn(
+                text: "Delete", textSize: 16,
+                buttonColor: Theme.of(context).scaffoldBackgroundColor,
+                textColor: Theme.of(context).primaryColorDark,
+                onClick: onClick
+              ),
+              SBtn(
+                text: "Don't delete", textSize: 16,
+                onClick: () => Navigator.of(context).pop(false),
+                buttonColor: Theme.of(context).scaffoldBackgroundColor,
+                textColor: Theme.of(context).primaryColorDark,
+              )
+            ],
+          );
+        }
+      );
+    }
+  );
 }

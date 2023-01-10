@@ -35,19 +35,18 @@ class _CentreScreenState extends State<CentreScreen> {
     return CustomScrollView(
       controller: scroll,
       slivers: [
-        SliverAppBar.large(
+        SliverAppBar.medium(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          flexibleSpace: CentreProfile(
-            selectedCountry: widget.selectedCountry,
-            height: 310,
-            ),
-          expandedHeight: 310,
+          flexibleSpace: const CentreProfile(),
+          expandedHeight: 170,
         ),
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
           sliver: SliverToBoxAdapter(
             child: Column(
               children: [
+                CentreOtherProfile(selectedCountry: widget.selectedCountry),
+                const SizedBox(height: 10,),
                 //User selected Service and other information
                 SUPB(
                   service: widget.service,
@@ -202,11 +201,27 @@ class _CentreScreenState extends State<CentreScreen> {
                 ),
                 const SizedBox(height: 10,),
                 SetTab(
+                  settingHeader: "Request account info",
+                  settingDetail: "Create a report of your Serch account information",
+                  prefixIcon: CupertinoIcons.download_circle,
+                  onPressed: () => Get.to(() => const RequestAccountInfoScreen())
+                ),
+                const SizedBox(height: 10,),
+                SetTab(
+                  prefixIcon: CupertinoIcons.power,
+                  settingHeader: "Sign Out",
+                  settingDetail: "Log out of Serch app. We would love to see you again.",
+                  onPressed: () => openLogOutAccount(context)
+                ),
+                const SizedBox(height: 10,),
+                SetTab(
                   prefixIcon: CupertinoIcons.trash,
                   settingHeader: "Delete",
                   settingDetail: "Remove your Serch account.",
-                  onPressed: () => openDeleteAccount(context)
+                  onPressed: () => Get.to(() => const DeleteMyAccountScreen()),
+                  // onPressed: () => openDeleteAccount(context)
                 ),
+                const SizedBox(height: 10,),
 
                 const SizedBox(height: 40),
                 Container(
@@ -257,7 +272,13 @@ class _CentreScreenState extends State<CentreScreen> {
                 if(showMe == true)
                 const AllPermissions()
                 else
-                Container()
+                Container(),
+
+                const SizedBox(height: 40),
+                Center(
+                  child: Image.asset(SImages.logoName, width: 130, color: Theme.of(context).primaryColor,),
+                ),
+                const SizedBox(height: 40),
               ]
             ),
           ),

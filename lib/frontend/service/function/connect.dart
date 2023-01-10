@@ -2,56 +2,240 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:provide/lib.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void showProviderProfile({
-  required BuildContext context,
-  required String distance,
-  required String tripCount,
-  required String name,
-}) {
-  showModalBottomSheet(
-    context: context,
-    enableDrag: true,
-    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-    builder: (context) => SizedBox(
-      height: MediaQuery.of(context).size.height / 1,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ConnectionProfile(distance: distance, tripCount: tripCount, name: name,)
-      ),
-    )
-  );
-}
-
-void showCancelReason({
-  required BuildContext context,
-  required CheckBoxListModel checkList,
-}) => showDialog(
+void showCancelReason({required BuildContext context}) => showDialog(
   context: context,
-  builder: (context) => AlertDialog(
-    title: SText(text: "We just want to know...", color: Theme.of(context).primaryColor, size: 16, weight: FontWeight.bold),
-    content: Column(
-      children: [
-        SText(text: "What are your reasons for cancelling this service trip?.", color: Theme.of(context).primaryColor, size: 16),
-        const SizedBox(height: 10),
-        CheckboxListTile(
-          value: checkList.value,
-          onChanged: checkList.onChanged,
-          subtitle: SText(text: checkList.reason, color: Theme.of(context).primaryColor, size: 16),
-        )
-      ],
-    ),
-  )
+  builder: (context) {
+    bool onTrip = true;
+    TextEditingController reason = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return AlertDialog(
+          backgroundColor: Theme.of(context).bottomAppBarColor,
+          elevation: 0,
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              SText(text: "We just want to know...", color: Theme.of(context).primaryColor, size: 20, weight: FontWeight.bold),
+              SText(text: "What is your reason for cancelling this service trip?.", color: Theme.of(context).primaryColor, size: 16),
+            ],
+          ),
+          content: Form(
+            key: formKey,
+            child: TextFormField(
+              controller: reason,
+              maxLines: 5,
+              minLines: 1,
+              validator: (value) {
+                if(reason.value.text.length < 5){
+                  return "This field cannot be empty";
+                } else {
+                  return null;
+                }
+              },
+              decoration: InputDecoration(
+                hintText: "Your Reason (Optional)",
+                hintStyle: STexts.hints(context),
+                fillColor: Theme.of(context).scaffoldBackgroundColor,
+                prefixIcon: const Icon(Icons.read_more, color: SColors.red),
+                enabledBorder: UnderlineInputBorder(
+                  borderRadius: const BorderRadius.all(Radius.circular(5)),
+                  borderSide: BorderSide(
+                    width: 4,
+                    color: Theme.of(context).primaryColor,
+                    style: BorderStyle.solid,
+                  ),
+                ),
+                focusedBorder: const UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: SColors.lightPurple,
+                    width: 2,
+                  ),
+                )
+              ),
+            ),
+          ),
+          actions: [
+            SBtn(
+              text: "Cancel Trip", textSize: 16,
+              buttonColor: Theme.of(context).bottomAppBarColor,
+              textColor: SColors.lightPurple,
+              onClick: () {
+                if(!formKey.currentState!.validate()){
+                  return;
+                } else {
+                  setState(() => onTrip = false);
+                UserConnection().saveOnTrip(onTrip);
+                Get.offUntil(GetPageRoute(page: () => const BottomNavigator(newPage: 0)), (route) => false);
+                }
+              }
+            ),
+            SBtn(
+              text: "Don't cancel", textSize: 16,
+              onClick: () => Navigator.of(context).pop(false),
+              buttonColor: Theme.of(context).bottomAppBarColor,
+              textColor: SColors.lightPurple,
+            )
+          ],
+        );
+      }
+    );
+  }
 );
 
-void showRatingDialog(BuildContext context){
-  showCupertinoModalPopup(context: context, builder: (context) => Container(
-    color: Theme.of(context).backgroundColor
-  ));
-}
+void showRateReason({
+  required BuildContext context, required String thisUser, required String rateStatus
+}) => showDialog(
+  context: context,
+  builder: (context) {
+    bool onTrip = true;
+    TextEditingController reason = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return AlertDialog(
+          backgroundColor: Theme.of(context).bottomAppBarColor,
+          elevation: 0,
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              SText(text: "We just want to know...", color: Theme.of(context).primaryColor, size: 20, weight: FontWeight.bold),
+              SText(text: "Why are you rating the $thisUser $rateStatus?.", color: Theme.of(context).primaryColor, size: 16),
+            ],
+          ),
+          content: Form(
+            key: formKey,
+            child: TextFormField(
+              controller: reason,
+              maxLines: 5,
+              minLines: 1,
+              validator: (value) {
+                if(reason.value.text.length < 5){
+                  return "This field cannot be empty";
+                } else {
+                  return null;
+                }
+              },
+              decoration: InputDecoration(
+                hintText: "Your Reason (Optional)",
+                hintStyle: STexts.hints(context),
+                fillColor: Theme.of(context).scaffoldBackgroundColor,
+                prefixIcon: const Icon(Icons.read_more, color: SColors.red),
+                enabledBorder: UnderlineInputBorder(
+                  borderRadius: const BorderRadius.all(Radius.circular(5)),
+                  borderSide: BorderSide(
+                    width: 4,
+                    color: Theme.of(context).primaryColor,
+                    style: BorderStyle.solid,
+                  ),
+                ),
+                focusedBorder: const UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: SColors.lightPurple,
+                    width: 2,
+                  ),
+                )
+              ),
+            ),
+          ),
+          actions: [
+            SBtn(
+              text: "Rate", textSize: 16,
+              buttonColor: Theme.of(context).bottomAppBarColor,
+              textColor: SColors.lightPurple,
+              onClick: () {
+                if(!formKey.currentState!.validate()){
+                  return;
+                } else {
+                  setState(() => onTrip = false);
+                  UserConnection().saveOnTrip(onTrip);
+                  Get.offUntil(GetPageRoute(page: () => const BottomNavigator(newPage: 0)), (route) => false);
+                }
+              }
+            ),
+            SBtn(
+              text: "No reason", textSize: 16,
+              onClick: () {
+                setState(() => onTrip = false);
+                UserConnection().saveOnTrip(onTrip);
+                Get.offUntil(GetPageRoute(page: () => const BottomNavigator(newPage: 0)), (route) => false);
+              },
+              buttonColor: Theme.of(context).bottomAppBarColor,
+              textColor: SColors.lightPurple,
+            )
+          ],
+        );
+      }
+    );
+  }
+);
+
+void showRatingDialog({required BuildContext context, required String user}) => showDialog(
+  context: context, builder: (context) {
+    double rating = 0;
+    return StatefulBuilder(builder: (context, setState) {
+      return AlertDialog(
+        backgroundColor: Theme.of(context).bottomAppBarColor,
+        elevation: 0,
+        title: SText.center(
+          text: "Rate your service trip with $user",
+          size: 24,
+          color: Theme.of(context).primaryColor,
+          weight: FontWeight.bold
+        ),
+        content: RatingBar.builder(
+          initialRating: 0,
+          itemCount: 5,
+          minRating: 1,
+          allowHalfRating: true,
+          wrapAlignment: WrapAlignment.center,
+          itemPadding: const EdgeInsets.symmetric(horizontal: 1.0),
+          itemBuilder: (context, index) {
+            switch (index) {
+              case 0:
+                return const Icon(Icons.sentiment_very_dissatisfied, color: Colors.red,);
+              case 1:
+                return const Icon(Icons.sentiment_dissatisfied, color: Colors.redAccent,);
+              case 2:
+                return const Icon(Icons.sentiment_neutral, color: Colors.amber,);
+              case 3:
+                return const Icon(Icons.sentiment_satisfied, color: Colors.lightGreen,);
+              case 4:
+                return const Icon(Icons.sentiment_very_satisfied, color: Colors.green,);
+              default:
+                return const Icon(Icons.sentiment_very_satisfied, color: Colors.green,);
+            }
+          },
+          onRatingUpdate: (newRating) {
+            setState(() => rating = newRating);
+            debugShow(newRating);
+          },
+        ),
+        actions: [
+          SBtn(
+            text: "Rate", textSize: 16,
+            buttonColor: Theme.of(context).bottomAppBarColor,
+            textColor: SColors.lightPurple,
+            onClick: () => showRateReason(
+              context: context, thisUser: user,
+              rateStatus: rating.isEqual(0) ? "bad" : rating.toInt() < 3 ? "bad" :"good"
+            )
+          ),
+        ],
+      );
+    }
+    );
+  }
+);
 
  // showAboutDialog(
   //   applicationName: "Serch Provider",

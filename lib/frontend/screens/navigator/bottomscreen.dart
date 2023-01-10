@@ -9,7 +9,8 @@ import 'package:provide/lib.dart';
 import 'package:provider/provider.dart';
 
 class BottomNavigator extends StatefulWidget {
-  const BottomNavigator({super.key});
+  final int? newPage;
+  const BottomNavigator({super.key, this.newPage});
 
   @override
   State<BottomNavigator> createState() => _BottomNavigatorState();
@@ -17,7 +18,7 @@ class BottomNavigator extends StatefulWidget {
 
 class _BottomNavigatorState extends State<BottomNavigator> {
   //For BottomNavigationBar
-  final ValueNotifier<int> pageIndex = ValueNotifier(4);
+  late ValueNotifier<int> pageIndex = ValueNotifier(widget.newPage ?? 4 );
   final ValueNotifier<String> title = ValueNotifier('Messages');
 
   //Database Fetching and Provider Fetching
@@ -148,10 +149,6 @@ class _BottomNavigatorState extends State<BottomNavigator> {
   @override
   void initState() {
     super.initState();
-    // getCurrentUserServiceInfo();
-    // SerchUser.getCurrentUserInfo();
-    // // SerchUser.getCurrentUserServiceInfo();
-    // getCurrentUserAddInfo();
     getConnection(context);
     getCountry();
     // UserNotifications.initNotification();
@@ -170,7 +167,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
     //Checking authentication status
     bool finishSignup = true;
     bool verifyEmail = true;
-    String service = Provider.of<UserServiceInformation>(context, listen: false).service ?? "Plumber";
+    String service = Provider.of<UserServiceInformation>(context, listen: false).model.service ?? "Plumber";
     String phone = Provider.of<UserInformation>(context, listen: false).user.phone ?? "";
     String gender = Provider.of<UserInformation>(context, listen: false).user.gender ?? "";
     int earnings = 500;

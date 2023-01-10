@@ -11,16 +11,70 @@ class PreferenceSettingScreen extends StatefulWidget {
 }
 
 class _PreferenceSettingScreenState extends State<PreferenceSettingScreen> {
-  bool showOnMapbool = false;
-  bool onSWMbool = false;
-  bool callbool = false;
-  bool chatbool = false;
-  bool otherbool = false;
-  bool showAppBadge = false;
-  bool alwaysOnlinebool = false;
+  bool chat = false;
+  void toggleChatNotification(val) {
+    if(UserPermissions().getChatNotificationPermit()){
+      setState(() => chat = false);
+      UserPermissions().saveChatNotificationPermit(chat);
+    } else {
+      setState(() => chat = true);
+      UserPermissions().saveChatNotificationPermit(chat);
+    }
+  }
 
-  void toggleAppBadge(bool newValue){
-    setState(() => showAppBadge = newValue);
+  bool call = false;
+  void toggleCallNotification(val) {
+    if(UserPermissions().getCallNotificationPermit()){
+      setState(() => call = false);
+      UserPermissions().saveCallNotificationPermit(call);
+    } else {
+      setState(() => call = true);
+      UserPermissions().saveCallNotificationPermit(call);
+    }
+  }
+
+  bool other = false;
+  void togglePushNotification(val) {
+    if(UserPermissions().getPushNotificationPermit()){
+      setState(() => other = false);
+      UserPermissions().savePushNotificationPermit(other);
+    } else {
+      setState(() => other = true);
+      UserPermissions().savePushNotificationPermit(other);
+    }
+  }
+
+  bool showOnMap = false;
+  void toggleShowOnMap(val) {
+    if(UserPreferences().getShowOnMap()){
+      setState(() => showOnMap = false);
+      UserPreferences().saveShowOnMap(showOnMap);
+    } else {
+      setState(() => showOnMap = true);
+      UserPreferences().saveShowOnMap(showOnMap);
+    }
+  }
+
+  bool alwaysOnline = false;
+  void toggleAlwaysOnline(val) {
+    if(UserPreferences().getShowAlwaysOnline()){
+      setState(() => alwaysOnline = false);
+      UserPreferences().saveShowAlwaysOnline(alwaysOnline);
+    } else {
+      setState(() => alwaysOnline = true);
+      UserPreferences().saveShowAlwaysOnline(alwaysOnline);
+    }
+  }
+
+  bool onSWM = false;
+  void toggleSWM(val) {
+    if(UserPreferences().getSWM()){
+      setState(() => onSWM = false);
+      UserPreferences().saveSWM(onSWM);
+    } else {
+      setState(() => onSWM = true);
+      UserPreferences().saveSWM(onSWM);
+    }
   }
 
   @override
@@ -52,133 +106,87 @@ class _PreferenceSettingScreenState extends State<PreferenceSettingScreen> {
               child: Column(
                 children: [
                   SetTab(
+                    iconColor: UserPermissions().getChatNotificationPermit() ? SColors.green : null,
                     prefixIcon: CupertinoIcons.bubble_left_bubble_right,
-                    settingHeader: UserSharedPermits().getChatNotification() ? "Don't nofity me when I get a message" : "Notify me when I get a message",
+                    settingHeader: "Notify me when I get a message",
+                    settingDetail: UserPermissions().getChatNotificationPermit() ? "Enabled" : "Disabled",
                     widget: Switch(
                       inactiveThumbColor: SColors.hint,
                       inactiveTrackColor: SColors.grey,
                       activeColor: SColors.lightPurple,
-                      value: UserSharedPermits().getChatNotification(),
-                      onChanged: (val) async {
-                        // final notifyStatus = UserSharedPermits().getChatNotification();
-                        // if(notifyStatus){
-
-                        // } else {
-                        //   final permit = UserNotifications.notifications
-                        //     .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>
-                        //     ()!.requestPermission();
-                        //   if(permit == ){}
-                        // }
-                        setState(() => chatbool = val);
-                      }
+                      value: UserPermissions().getChatNotificationPermit(),
+                      onChanged: (val) => toggleChatNotification(val)
                     )
                   ),
                   const SizedBox(height: 10,),
                   SetTab(
+                    iconColor: UserPermissions().getCallNotificationPermit() ? SColors.green : null,
                     prefixIcon: CupertinoIcons.phone,
-                    settingHeader: UserSharedPermits().getCallNotification() ? "Don't alert me on calls" : "Alert me when a call comes in",
+                    settingHeader: "Alert me when a call comes in",
+                    settingDetail: UserPermissions().getCallNotificationPermit() ? "Enabled" : "Disabled",
                     widget: Switch(
                       inactiveThumbColor: SColors.hint,
                       inactiveTrackColor: SColors.grey,
                       activeColor: SColors.lightPurple,
-                      value: UserSharedPermits().getCallNotification(),
-                      onChanged: (val) => setState(() => callbool = val)
+                      value: UserPermissions().getCallNotificationPermit(),
+                      onChanged: (val) => toggleCallNotification(val)
                     )
                   ),
                   const SizedBox(height: 10,),
                   SetTab(
+                    iconColor: UserPermissions().getPushNotificationPermit() ? SColors.green : null,
                     prefixIcon: CupertinoIcons.bell,
-                    settingHeader: "${UserSharedPermits().getOtherNotification() ? "Disable" : "Enable"} notification for other information",
+                    settingHeader: "Notification for other information",
+                    settingDetail: UserPermissions().getPushNotificationPermit() ? "Enabled" : "Disabled",
                     widget: Switch(
                       inactiveThumbColor: SColors.hint,
                       inactiveTrackColor: SColors.grey,
                       activeColor: SColors.lightPurple,
-                      value: UserSharedPermits().getOtherNotification(),
-                      onChanged: (val) => setState(() => otherbool = val)
+                      value: UserPermissions().getPushNotificationPermit(),
+                      onChanged: (val) => togglePushNotification(val)
                     )
                   ),
                   const SizedBox(height: 10,),
                   SetTab(
+                    iconColor: UserPreferences().getShowOnMap() ? SColors.green : null,
                     prefixIcon: CupertinoIcons.bubble_left_bubble_right,
-                    settingHeader: UserSharedPermits().getShowOnMap() ? "Don't show me on map when busy" : "Show me on map when busy",
+                    settingHeader: "Show me on map when busy",
+                    settingDetail: UserPreferences().getShowOnMap() ? "Enabled" : "Disabled",
                     widget: Switch(
                       inactiveThumbColor: SColors.hint,
                       inactiveTrackColor: SColors.grey,
                       activeColor: SColors.lightPurple,
-                      value: UserSharedPermits().getShowOnMap(),
-                      onChanged: (val) => setState(() => showOnMapbool = val)
+                      value: UserPreferences().getShowOnMap(),
+                      onChanged: (val) => toggleShowOnMap(val)
                     )
                   ),
                   const SizedBox(height: 10,),
                   SetTab(
                     prefixIcon: CupertinoIcons.bolt_circle,
-                    iconColor: UserSharedPermits().getAlwaysOnline() ? SColors.green : null,
-                    settingHeader: UserSharedPermits().getAlwaysOnline() ? "Manually go online when I want." : "Appear online on app launch",
+                    iconColor: UserPreferences().getShowAlwaysOnline() ? SColors.green : null,
+                    settingHeader: "Appear online on app launch",
+                    settingDetail: UserPreferences().getShowAlwaysOnline() ? "Enabled" : "Disabled",
                     widget: Switch(
                       inactiveThumbColor: SColors.hint,
                       inactiveTrackColor: SColors.grey,
                       activeColor: SColors.lightPurple,
-                      value: UserSharedPermits().getAlwaysOnline(),
-                      onChanged: (val) {
-                        setState(() => alwaysOnlinebool = val);
-                        UserSharedPermits().saveAlwaysOnlineMode(PermitModel(alwaysOnline: alwaysOnlinebool));
-                      }
+                      value: UserPreferences().getShowAlwaysOnline(),
+                      onChanged: (val) => toggleAlwaysOnline(val)
                     )
                   ),
                   const SizedBox(height: 10,),
                   SetTab(
                     prefixIcon: CupertinoIcons.location,
-                    iconColor: UserSharedPermits().getSWM() ? Scolors.success : null,
-                    settingHeader: UserSharedPermits().getSWM() ? "Manually connect Stick-With-Me" : "Always connect Stick-With-Me",
+                    iconColor: UserPreferences().getSWM() ? Scolors.success : null,
+                    settingHeader: "Always connect Stick-With-Me",
+                    settingDetail: UserPreferences().getSWM() ? "Enabled" : "Disabled",
                     widget: Switch(
-                      value: UserSharedPermits().getSWM(),
+                      value: UserPreferences().getSWM(),
                       activeColor: SColors.lightPurple,
                       inactiveThumbColor: SColors.hint,
                       inactiveTrackColor: SColors.grey,
-                      onChanged: (swm) {
-                        var status = UserSharedPermits().getSWM();
-                        setState(() => status = swm);
-                        UserSharedPermits().saveSWMMode(PermitModel(onSWM: status));
-                      },
+                      onChanged: (val) => toggleSWM(val)
                     )
-                  ),
-                  const SizedBox(height: 10,),
-                  SetTab(
-                    prefixIcon: CupertinoIcons.app_badge,
-                    iconColor: UserSharedPermits().getShowAppBadge() ? SColors.yellow : null,
-                    settingHeader: "${UserSharedPermits().getShowAppBadge() ? "Don't allow" : "Allow"} app badge for notifications",
-                    widget: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: UserSharedPermits().getShowAppBadge() ? SColors.green : SColors.hint
-                      ),
-                    ),
-                    onPressed: () {
-                      final status = UserSharedPermits().getShowAppBadge();
-                      if(status){
-                        setState(() => showAppBadge = false);
-                        UserSharedPermits().saveShowAppBadgeMode(PermitModel(showAppBadge: showAppBadge));
-                      } else {
-                        setState(() => showAppBadge = true);
-                        UserSharedPermits().saveShowAppBadgeMode(PermitModel(showAppBadge: showAppBadge));
-                      }
-                    },
-                    // widget: Switch(
-                    //   value: UserSharedPermits().getShowAppBadge(),
-                    //   // value: showAppBadge,
-                    //   activeColor: SColors.lightPurple,
-                    //   inactiveThumbColor: SColors.hint,
-                    //   inactiveTrackColor: SColors.grey,
-                    //   onChanged: (newValue) {
-                    //     setState(() {
-                    //       showAppBadge = newValue;
-                    //       UserSharedPermits().saveShowAppBadgeMode(PermitModel(showAppBadge: showAppBadge));
-                    //     });
-                    //     // setState(() => UserSharedPermits().getShowAppBadge() ? false : true);
-                    //     // UserSharedPermits().saveShowAppBadgeMode(PermitModel(showAppBadge: UserSharedPermits().getShowAppBadge()));
-                    //   },
-                    // )
                   ),
                   const SizedBox(height: 100),
                 ]

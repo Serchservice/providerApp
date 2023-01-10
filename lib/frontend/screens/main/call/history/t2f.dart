@@ -23,17 +23,13 @@ class HistoryT2FCallScreen extends StatelessWidget {
       CallModel(callerName: "Francis Adimonyemma", callTime: "2:00am", t2fVC: true),
     ];
 
-    return CustomScrollView(
-      slivers: [
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            ((context, index) {
-              return SCallBox(call: allCallsList[index]);
-            }),
-            childCount: allCallsList.length,
-          ),
-        ),
-      ],
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        ((context, index) {
+          return SCallBox(call: allCallsList[index]);
+        }),
+        childCount: allCallsList.length,
+      ),
     );
   }
 }
