@@ -23,8 +23,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       appID: zegoAppID,
       appSign: zegoAppSign,
       callID: "123456",
-      userID: currentUserInfo!.serchID!,
-      userName: currentUserInfo!.firstName!,
+      userID: "ieoyquoqw",
+      userName: "Evaristus",
       config: ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall()
         ..layout = ZegoLayout.pictureInPicture(
           switchLargeOrSmallViewByClick: true,
@@ -35,7 +35,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
             barrierDismissible: false,
             builder: (BuildContext context) {
               return AlertDialog(
-                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                backgroundColor: Theme.of(context).backgroundColor,
+                elevation: 0,
                 title: SText(text: "Are you sure you want to end this call?", color: Theme.of(context).primaryColor, size: 18),
                 // content: const Text(
                 //     "You can customize this dialog however you like",
@@ -43,15 +44,15 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                 actions: [
                   SBtn(
                     text: "Yes, am done", textSize: 16,
-                    buttonColor: Theme.of(context).scaffoldBackgroundColor,
-                    textColor: Theme.of(context).primaryColorDark,
+                    buttonColor: Theme.of(context).backgroundColor,
+                    textColor: SColors.lightPurple,
                     onClick: () => Navigator.of(context).pop(true)
                   ),
                   SBtn(
                     text: "No, continue", textSize: 16,
                     onClick: () => Navigator.of(context).pop(false),
-                    buttonColor: Theme.of(context).scaffoldBackgroundColor,
-                    textColor: Theme.of(context).primaryColorDark,
+                    buttonColor: Theme.of(context).backgroundColor,
+                    textColor: SColors.lightPurple,
                   )
                 ],
               );

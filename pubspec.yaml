@@ -95,6 +95,8 @@ dependencies:
   audio_waveforms: ^1.0.0
   bubble: ^1.2.1
   pretty_qr_code: ^2.0.3
+  pdf: ^3.8.4
+  printing: ^5.9.3
 
 
 dependency_overrides:

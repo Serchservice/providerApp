@@ -12,6 +12,7 @@ export 'call/pages/received.dart';
 
 export 'call/video/incoming.dart';
 export 'call/video/video_call.dart';
+export 'call/video/t2f.dart';
 export 'call/voice/voice_call.dart';
 
 export 'call/widget/call_tab.dart';

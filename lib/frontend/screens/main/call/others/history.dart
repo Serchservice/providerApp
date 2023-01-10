@@ -64,9 +64,9 @@ class _CallHistoryScreenState extends State<CallHistoryScreen> with WidgetsBindi
             padding: screenPadding,
             sliver: SliverToBoxAdapter(
               child: Column(
-                children: [
-                  const CHH(),
-                  const SizedBox(height: 20),
+                children: const [
+                  CHH(),
+                  SizedBox(height: 20),
                 ],
               ),
             )
