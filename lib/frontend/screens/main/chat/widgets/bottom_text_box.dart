@@ -58,7 +58,9 @@ class PickEmoji extends StatelessWidget {
   }
 }
 
-showMore(context) => showModalBottomSheet(
+showMore({
+  required BuildContext context, void Function()? pickAudio
+}) => showModalBottomSheet(
   context: context,
   barrierColor: Colors.transparent,
   backgroundColor: Colors.transparent,
@@ -104,10 +106,11 @@ showMore(context) => showModalBottomSheet(
                 ),
                 SIconTextButton(
                   icon: Icons.headphones_rounded,
-                  onClick: () => pickFile(
-                    context: context, type: FileType.audio,
-                    allowMultiple: true,
-                  ),
+                  onClick: pickAudio,
+                  // onClick: () => pickFile(
+                  //   context: context, type: FileType.audio,
+                  //   allowMultiple: true,
+                  // ),
                   color: SColors.aries,
                   text: "Audio"
                 ),

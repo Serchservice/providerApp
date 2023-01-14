@@ -54,6 +54,7 @@ class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
               width: width,
               textWeight: FontWeight.bold,
               textSize: 18,
+              padding: const EdgeInsets.all(15),
               onClick: () => Get.offAll(() => const VerifyPasswordScreen()),
             ),
             const SizedBox(height: 40),

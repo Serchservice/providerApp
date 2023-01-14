@@ -129,7 +129,7 @@ class _UserChattingScreenState extends State<UserChattingScreen> {
     if (model.index?.isOdd ?? false) {
       controller.extractWaveformData(
         path: model.path!,
-        noOfSamples: playerWaveStyle.getSamplesForWidth(model.width ?? 200),
+        noOfSamples: playerWaveStyle.getSamplesForWidth(model.width ?? 150),
       );
     }
   }
@@ -298,12 +298,25 @@ class _UserChattingScreenState extends State<UserChattingScreen> {
   }
 
   void _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-    if (result != null) {
-      musicFile = result.files.single.path;
-      setState(() {});
-    } else {
-      debugPrint("File not picked");
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles();
+      if (result != null) {
+        musicFile = result.files.single.path;
+        setState(() {
+          path = musicFile;
+        });
+        sendMsg(model: MessageModel(
+          path: path,
+          time: MessageTime.getTime(),
+          isAudio: true,
+          appDirectory: appDirectory,
+          isSender: isSender
+        ));
+      } else {
+        debugPrint("File not picked");
+      }
+    } catch (e) {
+      debugPrint("File picked error $e");
     }
   }
 
@@ -588,7 +601,6 @@ class _UserChattingScreenState extends State<UserChattingScreen> {
                                   hintText: "Start typing...",
                                   hintStyle: const TextStyle(
                                     fontSize: 18,
-                                    letterSpacing: 1,
                                     color: SColors.hint,
                                   ),
                                   isDense: true,
@@ -610,8 +622,7 @@ class _UserChattingScreenState extends State<UserChattingScreen> {
                                         Material(
                                           color: Colors.transparent,
                                           child: InkWell(
-                                            // onTap: () => showMore(context),
-                                            onTap: () => showMore(context),
+                                            onTap: () => showMore(context: context, pickAudio: () => _pickFile()),
                                             child: Padding(
                                               padding: const EdgeInsets.all(8.0),
                                               child: Transform.rotate(

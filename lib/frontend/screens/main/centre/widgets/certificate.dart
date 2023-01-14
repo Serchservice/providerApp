@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -5,14 +6,26 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:provide/lib.dart';
 // ignore: depend_on_referenced_packages
 import 'package:vector_math/vector_math_64.dart';
 
 class CustomData {
   const CustomData({this.name = '[your name]'});
-
   final String name;
 }
+
+typedef LayoutCallbackWithData = Future<Uint8List> Function(PdfPageFormat pageFormat, CustomData data);
+
+class Example {
+  const Example(this.name, this.file, this.builder, [this.needsData = false]);
+  final String name;
+  final String file;
+  final LayoutCallbackWithData builder;
+  final bool needsData;
+}
+
+const examples = Example('CERTIFICATE', 'certificate.dart', generateCertificate, true);
 
 Future<Uint8List> generateCertificate(
     PdfPageFormat pageFormat, CustomData data) async {
@@ -23,18 +36,18 @@ Future<Uint8List> generateCertificate(
   final libreBaskervilleItalic = await PdfGoogleFonts.libreBaskervilleItalic();
   final libreBaskervilleBold = await PdfGoogleFonts.libreBaskervilleBold();
   final robotoLight = await PdfGoogleFonts.robotoLight();
-  final medail = await rootBundle.loadString('assets/medail.svg');
-  final swirls = await rootBundle.loadString('assets/swirls.svg');
-  final swirls1 = await rootBundle.loadString('assets/swirls1.svg');
-  final swirls2 = await rootBundle.loadString('assets/swirls2.svg');
-  final swirls3 = await rootBundle.loadString('assets/swirls3.svg');
-  final garland = await rootBundle.loadString('assets/garland.svg');
+  final medail = await rootBundle.loadString('asset/logo/logo.png');
+  final swirls = await rootBundle.loadString('asset/logo/logo.png');
+  final swirls1 = await rootBundle.loadString('asset/logo/logo.png');
+  final swirls2 = await rootBundle.loadString('asset/logo/logo.png');
+  final swirls3 = await rootBundle.loadString('asset/logo/logo.png');
+  final garland = await rootBundle.loadString('asset/logo/logo.png');
 
   pdf.addPage(
     pw.Page(
       build: (context) => pw.Column(
         children: [
-          pw.Spacer(flex: 2),
+          // pw.Spacer(flex: 2),
           pw.RichText(
             text: pw.TextSpan(
                 style: pw.TextStyle(
@@ -249,4 +262,50 @@ Future<Uint8List> generateCertificate(
   );
 
   return pdf.save();
+}
+
+
+class SkillCertificate extends StatefulWidget {
+  const SkillCertificate({super.key});
+
+  @override
+  State<SkillCertificate> createState() => _SkillCertificateState();
+}
+
+class _SkillCertificateState extends State<SkillCertificate> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(2),
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColor,
+        border: Border.all(
+          color: SColors.lightPurple,
+          width: 2.0
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).primaryColor,
+          border: Border.all(
+            color: SColors.lightPurple,
+            width: 2.0
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              padding: const EdgeInsets.all(3),
+              height: 80
+            ),
+            Container(
+              color: Theme.of(context).primaryColor,
+              padding: const EdgeInsets.all(6),
+            )
+          ],
+        )
+      )
+    );
+  }
 }

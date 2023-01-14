@@ -101,19 +101,21 @@ void deleteUser({required BuildContext context, VoidCallback? onClick}) async {
       return StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
+            backgroundColor: Theme.of(context).backgroundColor,
+            elevation: 0,
             title: SText(text: "Are you sure you want to delete this user?.", color: Theme.of(context).primaryColor, size: 16),
             actions: [
               SBtn(
                 text: "Delete", textSize: 16,
-                buttonColor: Theme.of(context).scaffoldBackgroundColor,
-                textColor: Theme.of(context).primaryColorDark,
+                buttonColor: Theme.of(context).backgroundColor,
+                textColor: SColors.lightPurple,
                 onClick: onClick
               ),
               SBtn(
                 text: "Don't delete", textSize: 16,
                 onClick: () => Navigator.of(context).pop(false),
-                buttonColor: Theme.of(context).scaffoldBackgroundColor,
-                textColor: Theme.of(context).primaryColorDark,
+                buttonColor: Theme.of(context).backgroundColor,
+                textColor: SColors.lightPurple,
               )
             ],
           );

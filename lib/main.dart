@@ -8,6 +8,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future <void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: SColors.darkTheme,
+    statusBarBrightness: Brightness.dark
+  ));
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnon);
   await HiveStorage().init();

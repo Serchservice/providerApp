@@ -109,12 +109,6 @@ class _HelpSettingScreenState extends State<HelpSettingScreen> {
                     settingDetail: "Join the SGC family and make your own contributions and suggestions.",
                     onPressed: () => launchUniversalLinkIos(launchDiscord)
                   ),
-                  const SizedBox(height: 10),
-                  SetTab(
-                    settingHeader: "App Info",
-                    prefixIcon: Icons.info,
-                    onPressed: () => Get.to(() => const AppInfoScreen())
-                  ),
                   const SizedBox(height: 40),
                 ]
               )

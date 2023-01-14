@@ -12,7 +12,7 @@ class SlidePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return onTrip == false ? OnTripCount(
+    return onTrip ? OnTripCount(
       cancelClick: cancelClick,
       endClick: endClick,
     ) : const NoTripCount();
@@ -42,7 +42,7 @@ class _NoTripCountState extends State<NoTripCount> {
                 size: 22,
                 text: "${greeting()}${currentUserInfo?.firstName}",
                 weight: FontWeight.bold,
-                color: Theme.of(context).primaryColorDark
+                color: Theme.of(context).primaryColor
               ),
             ),
             const SizedBox(height: 5),
@@ -158,14 +158,15 @@ class _NoTripCountState extends State<NoTripCount> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SText(
-                  text: "You were invited by:",
+                  text: "On an RS invited by:",
                   size: 16, weight: FontWeight.bold,
                   color: Theme.of(context).primaryColorLight
                 ),
+                const SizedBox(height: 4),
                 Container(
                   padding: const EdgeInsets.all(15.0),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).backgroundColor,
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                   child: Row(
@@ -193,10 +194,10 @@ class _NoTripCountState extends State<NoTripCount> {
                                 borderRadius: BorderRadius.circular(4),
                                 child: InkWell(
                                   onTap: (){},
-                                  child: SIcon(
+                                  child: const SIcon(
                                     icon: CupertinoIcons.phone_fill,
                                     size: 20,
-                                    iconColor: Theme.of(context).primaryColorDark,
+                                    iconColor: SColors.lightPurple,
                                   ),
                                 ),
                               ),
@@ -205,10 +206,10 @@ class _NoTripCountState extends State<NoTripCount> {
                                 borderRadius: BorderRadius.circular(4),
                                 child: InkWell(
                                   onTap: (){},
-                                  child: SIcon(
+                                  child: const SIcon(
                                     icon: CupertinoIcons.video_camera_solid,
                                     size: 20,
-                                    iconColor: Theme.of(context).primaryColorDark,
+                                    iconColor: SColors.lightPurple,
                                   ),
                                 ),
                               ),
@@ -217,10 +218,10 @@ class _NoTripCountState extends State<NoTripCount> {
                                 borderRadius: BorderRadius.circular(4),
                                 child: InkWell(
                                   onTap: (){},
-                                  child: SIcon(
+                                  child: const SIcon(
                                     icon: CupertinoIcons.bubble_left_bubble_right_fill,
                                     size: 20,
-                                    iconColor: Theme.of(context).primaryColorDark,
+                                    iconColor: SColors.lightPurple,
                                   ),
                                 ),
                               ),
@@ -229,10 +230,10 @@ class _NoTripCountState extends State<NoTripCount> {
                                 borderRadius: BorderRadius.circular(4),
                                 child: InkWell(
                                   onTap: (){},
-                                  child: SIcon(
+                                  child: const SIcon(
                                     icon: Icons.cancel,
                                     size: 20,
-                                    iconColor: Theme.of(context).primaryColorDark,
+                                    iconColor: SColors.lightPurple,
                                   ),
                                 ),
                               ),

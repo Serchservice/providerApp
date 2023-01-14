@@ -106,7 +106,7 @@ void enableRequestShare({
                 ),
                 const SizedBox(height: 10),
                 Material(
-                  color: Theme.of(context).scaffoldBackgroundColor,
+                  color: Theme.of(context).backgroundColor,
                   shape: RoundedRectangleBorder(
                     side: BorderSide(color: Theme.of(context).primaryColor),
                     borderRadius: BorderRadius.circular(5),

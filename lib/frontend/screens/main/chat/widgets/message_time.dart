@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:date_time_format/date_time_format.dart';
 
 class MessageTime{
   static String timeAgoSinceDate(int time){
@@ -76,6 +77,13 @@ class MessageTime{
     } else {
       return b + a;
     }
+  }
+
+  static String getHeaderTime() {
+    final dateTime = DateTime.now();
+    debugPrint(dateTime.format());
+    debugPrint(DateTimeFormat.format(dateTime));
+    return "";
   }
 
   static String getTime() {

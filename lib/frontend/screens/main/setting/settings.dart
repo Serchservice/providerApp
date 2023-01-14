@@ -98,17 +98,9 @@ class _SettingScreenState extends State<SettingScreen> {
                   ),
                   const SizedBox(height: 10),
                   SetTab(
-                    settingDetail: "Network usage, storage location",
-                    prefixIcon: Icons.storage,
-                    settingHeader: "Storage and data",
-                    onPressed: () => Get.to(() => const HelpSettingScreen())
-                  ),
-                  const SizedBox(height: 10),
-                  SetTab(
-                    settingDetail: "(phone's language)",
-                    prefixIcon: Icons.public,
-                    settingHeader: "App Language",
-                    onPressed: () => Get.to(() => const HelpSettingScreen())
+                    settingHeader: "App Info",
+                    prefixIcon: Icons.info,
+                    onPressed: () => Get.to(() => const AppInfoScreen())
                   ),
                   const SizedBox(height: 20),
                 ],

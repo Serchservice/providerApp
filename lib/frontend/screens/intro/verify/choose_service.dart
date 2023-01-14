@@ -75,7 +75,7 @@ class _ChooseServiceScreenState extends State<ChooseServiceScreen> {
                   textButton: "Skip this section for now",
                   onClick: () => Get.to(() => const AdditionalScreen()),
                   textColor: Theme.of(context).primaryColorLight,
-                  textButtonColor: Theme.of(context).primaryColorDark,
+                  textButtonColor: SColors.lightPurple,
                 )
             ],
           ),

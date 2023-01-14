@@ -294,7 +294,7 @@ class _Tip2FixWalletScreenState extends State<Tip2FixWalletScreen> {
           builder:(context, setState) => Container(
             padding: screenPadding,
             decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
+              color: Theme.of(context).backgroundColor,
               borderRadius: BorderRadius.circular(10),
             ),
             child: CustomScrollView(
@@ -340,7 +340,7 @@ class _Tip2FixWalletScreenState extends State<Tip2FixWalletScreen> {
             padding: screenPadding,
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
+              color: Theme.of(context).backgroundColor,
               borderRadius: BorderRadius.circular(10),
             ),
             child: CustomScrollView(
@@ -400,7 +400,7 @@ class _Tip2FixWalletScreenState extends State<Tip2FixWalletScreen> {
             padding: screenPadding,
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
+              color: Theme.of(context).backgroundColor,
               borderRadius: BorderRadius.circular(10),
             ),
             child: CustomScrollView(
@@ -479,7 +479,7 @@ addBankAccount({
           padding: screenPadding,
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
+            color: Theme.of(context).backgroundColor,
             borderRadius: BorderRadius.circular(10),
           ),
           child: SingleChildScrollView(
@@ -501,7 +501,7 @@ addBankAccount({
                         formName: "Account Number",
                         controller: accountNumber,
                         cursorColor: Theme.of(context).primaryColor,
-                        fillColor: Theme.of(context).scaffoldBackgroundColor,
+                        fillColor: Theme.of(context).backgroundColor,
                         formStyle: STexts.normalForm(context),
                         formColor: Theme.of(context).primaryColor,
                         enabledBorderColor: Theme.of(context).primaryColor,
@@ -512,7 +512,7 @@ addBankAccount({
                         formName: "Bank Name",
                         onChanged: (value) => setState(() => myBank = value.toString()),
                         onSaved: (value) => setState(() => myBank = value.toString()),
-                        fillColor: Theme.of(context).scaffoldBackgroundColor,
+                        fillColor: Theme.of(context).backgroundColor,
                         formColor: Theme.of(context).primaryColor,
                         enabledBorderColor: Theme.of(context).primaryColor,
                       ),
@@ -524,7 +524,7 @@ addBankAccount({
                             formName: "Account Name",
                             enabled: false,
                             cursorColor: Theme.of(context).primaryColor,
-                            fillColor: Theme.of(context).scaffoldBackgroundColor,
+                            fillColor: Theme.of(context).backgroundColor,
                             formStyle: STexts.normalForm(context),
                             formColor: Theme.of(context).primaryColor,
                           ),

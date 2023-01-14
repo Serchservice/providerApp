@@ -15,7 +15,7 @@ class _CentreProfileState extends State<CentreProfile> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    double height = 150;
+    double height = 190;
 
     String userFirstName = Provider.of<UserInformation>(context, listen: false).user.firstName ?? "";
     String userLastName = Provider.of<UserInformation>(context, listen: false).user.lastName ?? "";
@@ -36,7 +36,7 @@ class _CentreProfileState extends State<CentreProfile> {
           //Background Image for the Profile, Profile Picture, Service Symbol and Status
           Container(
             width: width,
-            height: height - 50,
+            height: height - 40,
             decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage(SImages.centreOne),
@@ -169,8 +169,8 @@ class _CentreOtherProfileState extends State<CentreOtherProfile> {
 
 
     return Container(
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Theme.of(context).backgroundColor, width: 2))
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: SColors.hint, width: 1))
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

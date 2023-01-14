@@ -37,6 +37,7 @@ export 'centre/pages/tip2fix_wallet.dart';
 export 'centre/pages/amt_to_withdraw.dart';
 export 'centre/pages/account_request.dart';
 export 'centre/pages/delete_account.dart';
+export 'centre/pages/generate_cert.dart';
 
 export 'centre/widgets/files_tab.dart';
 export 'centre/widgets/no_referral.dart';
@@ -44,6 +45,7 @@ export 'centre/widgets/rating_tab.dart';
 export 'centre/widgets/refer_tree.dart';
 export 'centre/widgets/scheduled.dart';
 export 'centre/widgets/permissions.dart';
+export 'centre/widgets/certificate.dart';
 
 export 'centre/centre.dart';
 export 'centre/centre_profile.dart';

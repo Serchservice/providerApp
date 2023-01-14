@@ -19,7 +19,7 @@ class SServiceContainer extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
         decoration: BoxDecoration(
-          color: selected ? SColors.blue : Theme.of(context).scaffoldBackgroundColor,
+          color: selected ? SColors.green : SColors.aqua,
           borderRadius: BorderRadius.circular(3),
         ),
         child: SText.center(

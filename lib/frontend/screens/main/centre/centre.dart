@@ -38,7 +38,7 @@ class _CentreScreenState extends State<CentreScreen> {
         SliverAppBar.medium(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           flexibleSpace: const CentreProfile(),
-          expandedHeight: 170,
+          expandedHeight: 190,
         ),
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -48,11 +48,11 @@ class _CentreScreenState extends State<CentreScreen> {
                 CentreOtherProfile(selectedCountry: widget.selectedCountry),
                 const SizedBox(height: 10,),
                 //User selected Service and other information
-                SUPB(
-                  service: widget.service,
-                  gender: widget.gender,
-                  phone: widget.phone
-                ),
+                // SUPB(
+                //   service: widget.service,
+                //   gender: widget.gender,
+                //   phone: widget.phone
+                // ),
 
                 //Email Verification
                 if (widget.verified == false) Column(
@@ -207,6 +207,13 @@ class _CentreScreenState extends State<CentreScreen> {
                   onPressed: () => Get.to(() => const RequestAccountInfoScreen())
                 ),
                 const SizedBox(height: 10,),
+                // SetTab(
+                //   settingHeader: "Generate skill certificate",
+                //   settingDetail: "Generate a reusable certificate for any place",
+                //   prefixIcon: Icons.file_download,
+                //   onPressed: () => Get.to(() => const GenerateCertificateScreen())
+                // ),
+                // const SizedBox(height: 10,),
                 SetTab(
                   prefixIcon: CupertinoIcons.power,
                   settingHeader: "Sign Out",

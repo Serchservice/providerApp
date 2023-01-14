@@ -123,9 +123,8 @@ class _ReferTreeState extends State<ReferTree> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       SText(
-                        text: widget.referLink, color: SColors.blue,
-                        size: 16, weight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
+                        text: widget.referLink, color: SColors.hint,
+                        size: 16, decoration: TextDecoration.underline,
                       ),
                       const SizedBox(width: 10),
                       Material(

@@ -261,7 +261,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 20.0),
                         child: Material(
                           borderRadius: BorderRadius.circular(5.0),
-                          color: Theme.of(context).backgroundColor,
+                          color: Theme.of(context).scaffoldBackgroundColor,
                           child: InkWell(
                             onTap: () => searchProvidersWithCurrentLocation(serviceLocation, context),
                             child: Padding(

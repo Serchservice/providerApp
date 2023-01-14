@@ -97,6 +97,7 @@ dependencies:
   pretty_qr_code: ^2.0.3
   pdf: ^3.8.4
   printing: ^5.9.3
+  date_time_format: ^2.0.1
 
 
 dependency_overrides:

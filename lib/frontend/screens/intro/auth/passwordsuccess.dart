@@ -49,6 +49,7 @@ class ResetPasswordSuccessScreen extends StatelessWidget {
                 width: width,
                 textWeight: FontWeight.bold,
                 textSize: 18,
+                padding: const EdgeInsets.all(15),
                 onClick: () => Get.offAll(() => const LoginScreen()),
               ),
             ]
