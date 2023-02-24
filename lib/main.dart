@@ -10,11 +10,14 @@ Future <void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: SColors.darkTheme,
-    statusBarBrightness: Brightness.dark
+    statusBarBrightness: Brightness.light,
+    statusBarIconBrightness: Brightness.light
   ));
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom]);
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnon);
   await HiveStorage().init();
+  Get.updateLocale(const Locale('en'));
   cameras = await availableCameras();
   runApp(const MyApp());
 }

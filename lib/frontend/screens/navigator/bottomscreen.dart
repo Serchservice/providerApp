@@ -6,7 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:provide/lib.dart';
-import 'package:provider/provider.dart';
 
 class BottomNavigator extends StatefulWidget {
   final int? newPage;
@@ -22,7 +21,9 @@ class _BottomNavigatorState extends State<BottomNavigator> {
   final ValueNotifier<String> title = ValueNotifier('Messages');
 
   //Database Fetching and Provider Fetching
-  UserServiceInfo userServiceInfo = UserServiceInfo();
+  UserInformationModel userInformationModel = HiveUserDatabase().getProfileData();
+  UserServiceAndPlan userServiceAndPlan = HiveUserDatabase().getServiceAndPlanData();
+  UserAdditionalModel userAdditionalModel = UserAdditionalModel();
 
   //For Connection Checking
   ConnectivityResult connectionState = ConnectivityResult.none;
@@ -30,92 +31,18 @@ class _BottomNavigatorState extends State<BottomNavigator> {
   bool isAlert = false;
   StreamSubscription? subscription;
 
-  //Country Checker
-  Country? _selectedCountry;
-  bool country = false;
-  String? countryDialCode;
-
-  void getCurrentUserServiceInfo() async {
-    // DocumentReference ref = MainDB().providers.doc(user?.email).collection(SecondDB.profile).doc(ProfileDB.service);
-
-    // ref.get().then((DocumentSnapshot snapshot) {
-    //   if(snapshot.data() != null){
-    //     userServiceInfo = UserServiceInfo.fromSnapshot(snapshot);
-    //   } else {
-    //     debugShow("Error");
-    //   }
-    // }).onError((error, stackTrace) {
-    //   if(error == "field does not exist within the DocumentSnapshotPlatform"){
-    //     setState(() => hasService = true);
-    //   }
-    //   debugShow(error);
-    // });
-  }
-
-  void getCurrentUserAddInfo() async {
-    // DocumentReference ref = MainDB().providers.doc(user?.email).collection(SecondDB.profile).doc(ProfileDB.additional);
-
-    // ref.get().then((DocumentSnapshot snapshot) {
-    //   if(!snapshot.exists){
-    //     setState(() => finishSignup = true);
-    //   }else if(snapshot.data() != null){
-    //     currentUserAddInfo = UserAddInfo.fromSnapshot(snapshot);
-    //   } else {
-    //     debugShow("Error");
-    //   }
-    // }).onError((error, stackTrace) {
-    //   if(error.toString() == "field does not exist within the DocumentSnapshotPlatform"){
-    //     setState(() => finishSignup = true);
-    //   }
-    //   debugShow(error);
-    // });
-  }
-
   //Check ConnectionState everytime
   getConnection(context) => subscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) async {
     isDeviceConnected = await InternetConnectionChecker().hasConnection;
     connectionState = await Connectivity().checkConnectivity();
     if(!isDeviceConnected && isAlert == false){
-      showConnectionDialogBox(context: context);
+      showConnectionDialogBox(
+        context: context, connectionState: connectionState,
+        isAlert: isAlert, isDeviceConnected: isDeviceConnected
+      );
       setState(() => isAlert = true);
     }
   });
-
-  //Showing connection error when there is no connection
-  showConnectionDialogBox({
-    required BuildContext context, double titleSize = 14, double contentSize = 14, FontWeight titleWeight = FontWeight.bold,
-    FontWeight contentWeight = FontWeight.normal,
-  }) => showCupertinoDialog(
-      context: context,
-      builder:(context) => StatefulBuilder(
-        builder: (context, setState) => CupertinoAlertDialog(
-          title: SText(
-            text: connectionState == ConnectivityResult.mobile ? "No Mobile Connection"
-            : connectionState == ConnectivityResult.wifi ? "No Wifi Connection" : "No Connection",
-            size: titleSize, weight: titleWeight, color: SColors.black
-          ),
-          content: SText(
-            text: connectionState == ConnectivityResult.mobile ? "Please check your mobile data connection"
-            : connectionState == ConnectivityResult.wifi ? "Please check your wifi connection" : "Please check your internet connection",
-            size: contentSize, weight: contentWeight, color: SColors.black
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(context, 'Cancel');
-                setState(() => isAlert = false);
-                isDeviceConnected = await InternetConnectionChecker().hasConnection;
-                if(!isDeviceConnected){
-                  showConnectionDialogBox(context: context);
-                  setState(() => isAlert = true);
-                }
-              },
-              child: SText(text: "Understood", color: SColors.black, weight: titleWeight, size: titleSize),
-            )
-          ],
-      )
-    )
-  );
 
   ///Handling Navigation Bar for the HomeScreens
   // void onNavigationItemSelected(index) => pageIndex.value = index;
@@ -123,14 +50,6 @@ class _BottomNavigatorState extends State<BottomNavigator> {
     setState(() {
       pageIndex.value = index;
     });
-  }
-
-  //Getting the country stored in the User's Db and Provider
-  void getCountry() {
-    countryDialCode = Provider.of<UserInformation>(context, listen: false).user.countryDialCode ?? "NG";
-    _selectedCountry = countries.firstWhere((country) => country.dialCode == countryDialCode,
-    orElse: () => countries.first);
-    setState(() => country = true);
   }
 
   // void listenNotifications() => UserNotifications.onNotifications.stream.listen(onClickedNotification);
@@ -150,14 +69,13 @@ class _BottomNavigatorState extends State<BottomNavigator> {
   void initState() {
     super.initState();
     getConnection(context);
-    getCountry();
-    // UserNotifications.initNotification();
-    // listenNotifications();
+    Initializers().initializeUserAdditionalInfo(userInformationModel);
   }
 
   @override
   void dispose() {
     subscription?.cancel();
+    Initializers().disposeSubscription();
     super.dispose();
   }
 
@@ -165,39 +83,28 @@ class _BottomNavigatorState extends State<BottomNavigator> {
   @override
   Widget build(BuildContext context) {
     //Checking authentication status
-    bool finishSignup = true;
     bool verifyEmail = true;
-    String service = Provider.of<UserServiceInformation>(context, listen: false).model.service ?? "Plumber";
-    String phone = Provider.of<UserInformation>(context, listen: false).user.phone ?? "";
-    String gender = Provider.of<UserInformation>(context, listen: false).user.gender ?? "";
-    int earnings = 500;
-    String userAmount = "${getCurrency()}${earnings.toString()}";
+    // "${getCurrency()}${earnings.toString()}";
 
     final pages = [
       const HomeScreen(),
       const ChatScreen(),
       CallScreen(),
       const SettingScreen(),
-      CentreScreen(
-        finishSignup: finishSignup,
-        service: service,
-        phone: phone,
-        gender: gender,
-        verified: verifyEmail,
-        userAmount: userAmount,
-        selectedCountry: _selectedCountry!
-      ),
+      CentreScreen(verified: verifyEmail),
     ];
     return FeatureDiscovery(
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         extendBodyBehindAppBar: true,
         floatingActionButtonLocation: FloatingActionButtonLocation.startDocked,
-        body: ValueListenableBuilder(
-          valueListenable: pageIndex,
-          builder: (BuildContext context, int value, _) {
-            return pages[value];
-          },
+        body: SafeArea(
+          child: ValueListenableBuilder(
+            valueListenable: pageIndex,
+            builder: (BuildContext context, int value, _) {
+              return pages[value];
+            },
+          ),
         ),
         bottomNavigationBar: SafeArea(
           top: false,

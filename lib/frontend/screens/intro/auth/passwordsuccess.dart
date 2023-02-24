@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
 import 'package:provide/lib.dart';
 
 class ResetPasswordSuccessScreen extends StatelessWidget {
@@ -19,12 +18,7 @@ class ResetPasswordSuccessScreen extends StatelessWidget {
             children: [
               Padding(
                 padding: horizontalPadding,
-                child: Lottie.network(
-                  repeat: false,
-                  "https://assets9.lottiefiles.com/private_files/lf30_dqbik4tt.json",
-                  // "https://assets3.lottiefiles.com/private_files/lf30_tdnhii9y.json"
-                  height: 200,
-                ),
+                child: Image.asset(SImages.successDone),
               ),
               const SizedBox(height: 10),
               const SText(

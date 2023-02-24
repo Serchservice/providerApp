@@ -1,43 +1,75 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:provide/lib.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class BankDetails{
+  final String header;
+  final Widget widget;
+  const BankDetails({required this.header, required this.widget});
+}
 
 class Tip2FixWalletScreen extends StatefulWidget {
-  final String userAmount;
-  const Tip2FixWalletScreen({super.key, required this.userAmount});
+  const Tip2FixWalletScreen({super.key});
 
   @override
   State<Tip2FixWalletScreen> createState() => _Tip2FixWalletScreenState();
 }
 
 class _Tip2FixWalletScreenState extends State<Tip2FixWalletScreen> {
+  UserBankAccountModel userBankAccountModel = HiveUserDatabase().getBankAccountData();
+  UserBankCardModel userBankCardModel = HiveUserDatabase().getBankCardData();
+  UserInformationModel userInformationModel = HiveUserDatabase().getProfileData();
+  List<UserMoneyModel> transactionList = HiveUserDatabase().getMoneyDataList();
+  late int accountDuration;
+
+  void getAccountDuration() async {
+    try {
+      final result = await supabase.from(Supa().profile).select().eq("serchAuth", userInformationModel.serchAuth).single() as Map;
+      // Define the format of your created_at timestamp
+      final format = DateFormat("yyyy-MM-ddTHH:mm:ss.SSSSSS+00:00");
+      // Convert the string representation of the created_at timestamp to a DateTime object
+      DateTime createdAtDate = format.parse(result["created_at"]);
+      // Get the current date and time
+      DateTime now = DateTime.now();
+      // Calculate the difference in days between the created_at timestamp and the current date
+      accountDuration = now.difference(createdAtDate).inDays;
+    } on PostgrestException catch (e) {
+      accountDuration = 0;
+      showGetSnackbar(message: e.message, type: Popup.error);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getAccountDuration();
+  }
+
   @override
   Widget build(BuildContext context) {
-    bool userHasBankAccount = true;
-    bool userHasCompleted5Services = true;
-    bool userHasStayedFor30Days = true;
-    List<BankDetail> banks = [
-      BankDetail(
-        accountNumber: "5vdvdsd789797979797", id: "F3429Frfvsvbdjik24091",
-        bankName: "Wema", accountName: "Evaristus Adimonyemma"),
-      // BankDetail(
-      //   accountNumber: "897899789797979797", id: "Fegaas3gdggsdegvsvbdjik24091",
-      //   bankName: "Wema", accountName: "Evaristus Adimonyemma"),
+    List<BankDetails> bankDetails = [
+      BankDetails(
+        header: "Bank Card",
+        widget: userBankCardModel.cardNumber.isEmpty ? const NoBankCard() : Container()
+      ),
+      BankDetails(
+        header: "Bank Account",
+        widget: userBankAccountModel.accountNumber.isEmpty ? const AddBankAccount() : SizedBox(
+          height: 170,
+          child: BankBox(
+            bank: userBankAccountModel,
+            isGrid: true,
+            onMoreOptions: () {
+              debugShow("hi");
+              openBankOptions(bankId: userBankAccountModel.serchID, context: context);
+            },
+          ),
+        )
+      )
     ];
-
-    List<TransactionModel> transactionList = [
-      TransactionModel("12/01/2022", senderName: "Evaristus Adimonyemma", amount: 2000, status: "Pending"),
-      TransactionModel("12/01/2022", senderName: "Evaristus Adimonyemma", amount: 2000, status: "Withdrawn"),
-      TransactionModel("12/01/2022", senderName: "Evaristus Adimonyemma", amount: 2000, status: "Received")
-    ];
-
-    // List<TableRow> tables = [
-    //   tableHeader(["Name", "Amount", "Date", "Status"], isHeader: true),
-    //   tableHeader(["Evaristus Adimonyemma", "2,000", "12/01/2022", "Pending"]),
-    //   tableHeader(["Evaristus Adimonyemma", "3,500", "12/01/2022", "Withdrawn"]),
-    //   tableHeader(["Evaristus Adimonyemma", "10,000", "12/01/2022", "Received"]),
-    // ];
 
     return Scaffold(
       body: CustomScrollView(
@@ -76,33 +108,23 @@ class _Tip2FixWalletScreenState extends State<Tip2FixWalletScreen> {
                         Image.asset(SImages.wallet, width: 50,),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: Column(
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  const SText(
-                                    text: "T2F Earnings: ",
-                                    size: 18,
-                                    weight: FontWeight.bold,
-                                    color: Scolors.info
-                                  ),
-                                  SText(
-                                    text: widget.userAmount,
-                                    size: 18,
-                                    weight: FontWeight.bold,
-                                    color: Scolors.info
-                                  ),
-                                ]
-                              ),
-                            ]
+                          child: Text(
+                            // "₦${plan.price}",
+                            "T2F Earnings: ${CurrencyFormatter.formatter.format(double.parse(userInformationModel.balance))}",
+                            style: const TextStyle(
+                              fontFamily: "",
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: Scolors.info
+                            ),
                           ),
                         )
                       ],
                     )
                   ),
-            
+
                   //Button to popup the bottomSheet for the user to enter account number for funds transfer
+                  if(userBankAccountModel.accountNumber.isNotEmpty)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -116,10 +138,9 @@ class _Tip2FixWalletScreenState extends State<Tip2FixWalletScreen> {
                           borderRadius: 3,
                           onClick: () => openWithdrawDialog(
                             context: context,
-                            userHasBankAccount: userHasBankAccount,
-                            userHasCompleted5Services: userHasCompleted5Services,
-                            userHasStayedFor30Days: userHasStayedFor30Days,
-                            banks: banks
+                            userBankAccountModel: userBankAccountModel,
+                            userInformationModel: userInformationModel,
+                            accountDuration: accountDuration,
                           ),
                         ),
                       ),
@@ -129,61 +150,35 @@ class _Tip2FixWalletScreenState extends State<Tip2FixWalletScreen> {
               ),
             ),
           ),
-          //User Bank Account for withdrawal
-          if(userHasBankAccount == true)
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
-            sliver: SliverGrid(
-              delegate: SliverChildBuilderDelegate(
-                ((context, index) => BankBox(
-                  bank: banks[index],
-                  isGrid: true,
-                  onMoreOptions: () {
-                    debugShow(banks[index].id);
-                    openBankOptions(bankId: banks[index].id, context: context);
-                  },
-                )),
-                childCount: banks.length
-              ),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, crossAxisSpacing: 20, mainAxisSpacing: 15
-              ),
-            ),
+            sliver: SliverToBoxAdapter(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ...bankDetails.map((item) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SText(
+                        text: item.header,
+                        size: 18,
+                        weight: FontWeight.bold,
+                        color: Theme.of(context).primaryColor
+                      ),
+                      const SizedBox(height: 10),
+                      item.widget
+                    ],
+                  )).toList()
+                ],
+              )
+            )
           ),
-
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(10, 20, 10, 0),
             sliver: SliverToBoxAdapter(
               child: Column(
                 children: [
-                  //For the User to add a bank account
-                  if(userHasBankAccount == false || banks.length < 2)
-                  Material(
-                    color: Theme.of(context).backgroundColor,
-                    borderRadius: BorderRadius.circular(8),
-                    child: InkWell(
-                      onTap: () => addBankAccount(context: context),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.add_home, color: Theme.of(context).primaryColorLight, size: 26),
-                            const SizedBox(width: 5),
-                            SText(
-                              text: "Add Bank Account",
-                              size: 16,
-                              weight: FontWeight.bold,
-                              color: Theme.of(context).primaryColorLight
-                            )
-                          ]
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
                   Container(
                     padding: const EdgeInsets.all(6.0),
                     decoration: BoxDecoration(
@@ -198,7 +193,6 @@ class _Tip2FixWalletScreenState extends State<Tip2FixWalletScreen> {
                     )
                   ),
                   const SizedBox(height: 20),
-            
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -209,41 +203,15 @@ class _Tip2FixWalletScreenState extends State<Tip2FixWalletScreen> {
                       ),
                     ],
                   ),
-                  //Tippers and Amount History
-                  // Table(
-                  //   border: TableBorder(
-                  //     top: BorderSide(width: 0.2, color: Theme.of(context).primaryColorLight,),
-                  //     bottom: BorderSide(width: 0.2, color: Theme.of(context).primaryColorLight,),
-                  //     horizontalInside: BorderSide(width: 0.2, color: Theme.of(context).primaryColorLight,),
-                  //   ),
-                  //   columnWidths: const {
-                  //     0: FractionColumnWidth(0.33),
-                  //     1: FractionColumnWidth(0.23),
-                  //     2: FractionColumnWidth(0.20),
-                  //     3: FractionColumnWidth(0.25),
-                  //   },
-                  //   children: tables
-                  // ),
                 ]
               )
             )
           ),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                ((context, index) {
-                  return TransactionBox(model: transactionList[index]);
-                }),
-                childCount: transactionList.length
-              )
-            ),
-          ),
-
           if(transactionList.isEmpty)
           SliverToBoxAdapter(
             child: Column(
               children: const [
+                SizedBox(height: 40),
                 Center(
                   child: SText.center(
                     text: "No transactions yet",
@@ -256,6 +224,17 @@ class _Tip2FixWalletScreenState extends State<Tip2FixWalletScreen> {
             ),
           )
           else
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                ((context, index) {
+                  return TransactionBox(userMoneyModel: transactionList[index]);
+                }),
+                childCount: transactionList.length
+              )
+            ),
+          ),
           const SliverToBoxAdapter(child: SizedBox(height: 40))
         ],
       )
@@ -278,58 +257,112 @@ class _Tip2FixWalletScreenState extends State<Tip2FixWalletScreen> {
 
   void openWithdrawDialog({
     required BuildContext context,
-    required bool userHasBankAccount,
-    required bool userHasCompleted5Services,
-    required bool userHasStayedFor30Days,
-    required List<BankDetail> banks,
+    required UserBankAccountModel userBankAccountModel,
+    required UserInformationModel userInformationModel,
+    required int accountDuration,
   }){
 
-    if(userHasBankAccount && userHasCompleted5Services && userHasStayedFor30Days) {
-      //Show the user's account number/s for the user to choose which account to transfer money to.
+    if(userInformationModel.totalServiceTrips >= 5 && accountDuration >= 30) {
+      TextEditingController amount = MaskedTextController(mask: "00000");
+      final formKey = GlobalKey<FormState>();
       showModalBottomSheet(
         context: context,
         enableDrag: false,
-        backgroundColor: Colors.transparent,
-        builder: (context) => StatefulBuilder(
-          builder:(context, setState) => Container(
-            padding: screenPadding,
-            decoration: BoxDecoration(
-              color: Theme.of(context).backgroundColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Column(
-                    children: [
-                      SText(
-                        text: "Choose an account for withdrawal",
-                        size: 20,
-                        weight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      const SizedBox(height: 20),
-                    ],
+        builder: (context) => KeyboardDismisser(
+          gestures: const [
+            GestureType.onTap,
+            GestureType.onPanUpdateDownDirection,
+          ],
+          child: StatefulBuilder(
+            builder:(context, setState) => Container(
+              padding: screenPadding,
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Column(
+                      children: [
+                        SText(
+                          text: "Enter Withdrawal Amount",
+                          size: 20,
+                          weight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
                   ),
-                ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    ((context, index) => BankBox(
-                      bank: banks[index],
-                      onPress: () {
-                        debugShow(banks[index].id);
-                        enterWithdrawAmount(bank: banks[index], context: context);
-                      },
-                    )),
-                    childCount: banks.length,
-                  )
-                )
-              ]
-            ),
-          )
+                  SliverToBoxAdapter(
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(6.0),
+                          decoration: BoxDecoration(
+                            color: Scolors.info3,
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: Text(
+                            // "₦${plan.price}",
+                            "You can only make withdrawals once in a week!. Withdrawal limit is ${CurrencyFormatter.formatter.format(double.parse("20000"))} while the minimum is ${CurrencyFormatter.formatter.format(double.parse("1000"))}",
+                            style: const TextStyle(
+                              fontFamily: "",
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: SColors.black
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                      ]
+                    )
+                  ),
+                  SliverToBoxAdapter(
+                    child: Column(
+                      children: [
+                        BankBox(bank: userBankAccountModel),
+                        Form(
+                          key: formKey,
+                          child: Column(
+                            children: [
+                              SFormField(
+                                labelText: "0.00",
+                                formName: "Withdrawal Amount",
+                                controller: amount,
+                                keyboard: TextInputType.number,
+                                cursorColor: Theme.of(context).primaryColor,
+                                fillColor: Theme.of(context).scaffoldBackgroundColor,
+                                formStyle: STexts.normalForm(context),
+                                formColor: Theme.of(context).primaryColor,
+                                enabledBorderColor: Theme.of(context).primaryColor,
+                              ),
+                              const SizedBox(height: 10),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SButton(
+                                  text: "Cash Out",
+                                  width: MediaQuery.of(context).size.width,
+                                  padding: const EdgeInsets.all(14.0),
+                                  textWeight: FontWeight.bold,
+                                  textSize: 18,
+                                  onClick: () => {},
+                                ),
+                              ),
+                            ]
+                          )
+                        )
+                      ]
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ),
         )
       );
-    } else if(userHasBankAccount == true && userHasCompleted5Services == false){
+    } else if(userInformationModel.totalServiceTrips >= 5){
       //Tell the user that he has to complete 5 t2f services before being able to withdraw money
       showModalBottomSheet(
         context: context,
@@ -349,7 +382,7 @@ class _Tip2FixWalletScreenState extends State<Tip2FixWalletScreen> {
                   child: Column(
                     children: [
                       SText(
-                        text: "Looking to make a withdrawal?",
+                        text: "Hoping to make a withdrawal?",
                         size: 20,
                         weight: FontWeight.bold,
                         color: Theme.of(context).primaryColor,
@@ -378,18 +411,13 @@ class _Tip2FixWalletScreenState extends State<Tip2FixWalletScreen> {
                     ]
                   )
                 ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    ((context, index) => BankBox(bank: banks[index])),
-                    childCount: banks.length
-                  )
-                ),
+                BankBox(bank: userBankAccountModel),
               ]
             ),
           )
         )
       );
-    } else if(userHasBankAccount == true && userHasStayedFor30Days == false){
+    } else if(accountDuration < 30){
       //Tell the user that he has to run the account for 30days before being able to withdraw money
       showModalBottomSheet(
         context: context,
@@ -409,7 +437,7 @@ class _Tip2FixWalletScreenState extends State<Tip2FixWalletScreen> {
                   child: Column(
                     children: [
                       SText(
-                        text: "Looking to make a withdrawal?",
+                        text: "Hoping to make a withdrawal?",
                         size: 20,
                         weight: FontWeight.bold,
                         color: Theme.of(context).primaryColor,
@@ -438,27 +466,19 @@ class _Tip2FixWalletScreenState extends State<Tip2FixWalletScreen> {
                     ]
                   )
                 ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    ((context, index) => BankBox(bank: banks[index])),
-                    childCount: banks.length
-                  )
-                ),
+                BankBox(bank: userBankAccountModel),
               ]
             ),
           )
         )
       );
-    } else {
-      ///Show the user that he has no bank account attached to his profile, give him an option to add a bank account
-      ///Also tell the user to wait for 30days and run 5 t2f features before being able to withdraw.
-      addBankAccount(context: context);
     }
   }
 }
 
 addBankAccount({
   required BuildContext context,
+  required UserInformationModel userInformationModel
 }) async {
   final formKey = GlobalKey<FormState>();
   TextEditingController accountNumber = TextEditingController();
@@ -516,11 +536,11 @@ addBankAccount({
                         formColor: Theme.of(context).primaryColor,
                         enabledBorderColor: Theme.of(context).primaryColor,
                       ),
-                      if(verified == true)
+                      if(verified == false)
                       Column(
                         children: [
                           SFormField(
-                            labelText: "Evaristus Adimonyemma",
+                            labelText: "${userInformationModel.firstName} ${userInformationModel.lastName}",
                             formName: "Account Name",
                             enabled: false,
                             cursorColor: Theme.of(context).primaryColor,
@@ -533,7 +553,7 @@ addBankAccount({
                       )
                       else
                       const SizedBox(height: 20),
-                      if(verified == true)
+                      if(verified == false)
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: SButton(
@@ -569,3 +589,258 @@ addBankAccount({
   );
 }
 
+class NoBankCard extends StatelessWidget {
+  const NoBankCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Theme.of(context).backgroundColor,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.credit_card_off_rounded, color: Theme.of(context).primaryColorLight, size: 26),
+            const SizedBox(width: 5),
+            SText(
+              text: "No Credit Card",
+              size: 16,
+              weight: FontWeight.bold,
+              color: Theme.of(context).primaryColorLight
+            )
+          ]
+        ),
+      ),
+    );
+  }
+}
+
+class AddBankAccount extends StatelessWidget {
+  const AddBankAccount({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    UserInformationModel userInformationModel = HiveUserDatabase().getProfileData();
+    return Material(
+      color: Theme.of(context).backgroundColor,
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: () => addBankAccount(context: context, userInformationModel: userInformationModel),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.add_home, color: Theme.of(context).primaryColorLight, size: 26),
+              const SizedBox(width: 5),
+              SText(
+                text: "Add Bank Account",
+                size: 16,
+                weight: FontWeight.bold,
+                color: Theme.of(context).primaryColorLight
+              )
+            ]
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TransactionBox extends StatelessWidget {
+  final UserMoneyModel userMoneyModel;
+  const TransactionBox({super.key, required this.userMoneyModel});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      decoration: BoxDecoration(
+        color: Theme.of(context).backgroundColor,
+        borderRadius: BorderRadius.circular(8)
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                UserAvatar.small(image: userMoneyModel.transactImage),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SText(
+                        text: userMoneyModel.transactName, size: 18,
+                        color: Theme.of(context).primaryColorLight, weight: FontWeight.bold
+                      ),
+                      const SizedBox(height: 5),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2.0),
+                            child: Text(
+                              CurrencyFormatter.formatter.format(double.parse(userMoneyModel.transactAmount)),
+                              style: const TextStyle(
+                                fontFamily: "",
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                                color: SColors.hint
+                              ),
+                            ),
+                          ),
+                          SText(
+                            text: userMoneyModel.transactDate,
+                            color: SColors.hint, weight: FontWeight.bold,
+                          ),
+                          Icon(
+                            userMoneyModel.transactionType == "Outgoing" ? Icons.arrow_upward_rounded
+                            : Icons.arrow_downward_rounded,
+                            color: userMoneyModel.transactionType == "Outgoing" ? SColors.red : SColors.green,
+                            size: 18
+                          )
+                        ]
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 20),
+          SizedBox(
+            width: 60,
+            child: SText(
+              text: userMoneyModel.transactStatus,
+              color: userMoneyModel.transactStatus == "Pending" ? Scolors.info2
+              : userMoneyModel.transactStatus == "Received" ? Scolors.success : Scolors.error,
+              weight: FontWeight.bold
+            ),
+          ),
+        ],
+      )
+    );
+  }
+}
+
+class BankBox extends StatelessWidget{
+  final UserBankAccountModel bank;
+  final bool isGrid;
+  final void Function()? onLongPress;
+  final void Function()? onPress;
+  final void Function()? onMoreOptions;
+  const BankBox({ super.key, required this.bank, this.isGrid = false, this.onPress, this.onLongPress, this.onMoreOptions});
+
+  @override
+  Widget build(BuildContext context){
+    return Padding(
+      padding: isGrid ? const EdgeInsets.all(1.0) : const EdgeInsets.symmetric(vertical: 10),
+      child: Material(
+        borderRadius: BorderRadius.circular(8),
+        // color: Theme.of(context).backgroundColor,
+        child: InkWell(
+          onTap: onPress,
+          onLongPress: onLongPress,
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              image: const DecorationImage(
+                image: AssetImage(SImages.creditCard),
+                fit: BoxFit.cover
+              )
+            ),
+            child: isGrid
+            ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: SText(
+                        color: SColors.white,
+                        text: bank.bankName,
+                        size: 18, weight: FontWeight.bold,
+                        flow: TextOverflow.ellipsis,
+                      ),
+                    )
+                    ,
+                  ],
+                ),
+                const SizedBox(height: 10),
+                SText(
+                  color: SColors.white,
+                  text: bank.accountName,
+                  size: 16, weight: FontWeight.bold,
+                ),
+                const SizedBox(height: 5),
+                SText(
+                  color: SColors.white,
+                  text: "${bank.accountNumber.substring(0, 6)}****",
+                  size: 18, weight: FontWeight.bold,
+                ),
+                const SizedBox(height: 5),
+                //Icon for more options and Bank Logo
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset(SImages.layers, width: 25,),
+                    IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: onMoreOptions,
+                      icon: const Icon( Icons.delete, size: 24, color: Scolors.error)
+                    )
+                  ],
+                )
+              ],
+            )
+            : Row(
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset(SImages.layers, width: 25,),
+                        const SizedBox(width: 10),
+                        SText(
+                          color: SColors.white,
+                          text: bank.bankName,
+                          size: 20, weight: FontWeight.bold,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    SText(
+                      color: SColors.white,
+                      text: bank.accountName,
+                      size: 16, weight: FontWeight.bold,
+                    ),
+                    const SizedBox(height: 5),
+                    SText(
+                      color: SColors.white,
+                      text: bank.accountNumber,
+                      size: 14, weight: FontWeight.bold,
+                    ),
+                  ]
+                ),
+              ],
+            )
+          ),
+        ),
+      ),
+    );
+  }
+}

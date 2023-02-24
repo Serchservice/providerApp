@@ -1,17 +1,21 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provide/lib.dart';
 
 class ViewPickedImage extends StatefulWidget {
   static Route route({
-    required String image
-  }) => MaterialPageRoute(builder: (context) => ViewPickedImage(image: image,));
+    required String image, PlatformFile? imageFile, XFile? file
+  }) => MaterialPageRoute(builder: (context) => ViewPickedImage(image: image, imageFile: imageFile, file: file,));
 
   final String image;
-  const ViewPickedImage({super.key, required this.image});
+  final PlatformFile? imageFile;
+  final XFile? file;
+  const ViewPickedImage({super.key, required this.image, this.imageFile, this.file});
 
   @override
   State<ViewPickedImage> createState() => _ViewPickedImageState();
@@ -33,49 +37,36 @@ class _ViewPickedImageState extends State<ViewPickedImage> {
             size: 24
           )
         ),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              final image = await cropImage(image: imagePicture, context: context);
-              if(image == null) return;
-              setState(() => imagePicture = image);
-              Get.offUntil(GetPageRoute(page:() => EditProfileScreen(image: imagePicture)), (route) => false);
-            },
-            icon: Icon(
-              Icons.crop_rotate_outlined,
-              size: 24,
-              color: Theme.of(context).primaryColor
+      ),
+      body: Stack(
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            child: Image.file(
+              File(imagePicture),
+              fit: BoxFit.cover
             )
           ),
-        ],
-      ),
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: Column(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 1),
-                child: Image.file(
-                  File(imagePicture),
-                  fit: BoxFit.cover
-                )
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SButton(
-                text: "Save",
-                width: MediaQuery.of(context).size.width,
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Padding(
                 padding: const EdgeInsets.all(8.0),
-                textWeight: FontWeight.bold,
-                textSize: 18,
-                onClick: () => Get.offUntil(GetPageRoute(page:() => EditProfileScreen(image: imagePicture)), (route) => false),
+                child: SButton(
+                  text: "Save",
+                  width: MediaQuery.of(context).size.width,
+                  padding: const EdgeInsets.all(16.0),
+                  textWeight: FontWeight.bold,
+                  textSize: 18,
+                  onClick: () => Get.offUntil(GetPageRoute(page:() => EditProfileScreen(
+                    image: imagePicture, imageFile: widget.imageFile, file: widget.file,
+                  )), (route) => false),
+                ),
               ),
-            ),
-          ],
-        )
+            ],
+          ),
+        ],
       ),
     );
   }

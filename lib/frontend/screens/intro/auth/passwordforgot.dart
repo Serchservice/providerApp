@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:provide/lib.dart';
 
 class ForgotPasswordScreen extends StatefulWidget{
@@ -33,12 +32,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ),
                 Padding(
                   padding: horizontalPadding,
-                  child: Lottie.network(
-                    "https://assets5.lottiefiles.com/packages/lf20_dneo0c5x.json",
-                    height: 200,
-                  )
+                  child: Image.asset(SImages.passwordReset, width: 150, color: Theme.of(context).primaryColor)
                 ),
-                const ForgotPasswordForm()
+                const ForgotPasswordForm(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: Image.asset(SImages.tagline, width: 150, color: Theme.of(context).primaryColor),
+                )
               ]
           )
         )

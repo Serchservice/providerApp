@@ -1,4 +1,5 @@
 export 'others/dropdown.dart';
+export 'others/all_plans.dart';
 export 'others/feature_id.dart';
 
 export 'pages/centre.dart';

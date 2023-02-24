@@ -48,9 +48,12 @@ class SButtonText extends StatelessWidget {
   final Color textButtonColor;
   final String textButton;
   final VoidCallback? onClick;
+  final double? size;
+  final double? spacing;
+  final FontWeight? weight;
   const SButtonText({
     super.key, required this.text, this.textColor = SColors.grey, this.textButtonColor = SColors.lightPurple,
-    required this.textButton, this.onClick
+    required this.textButton, this.onClick, this.size, this.spacing, this.weight
   });
 
   @override
@@ -61,19 +64,19 @@ class SButtonText extends StatelessWidget {
       children: [
         SText(
           text: text,
-          size: 16,
+          size: size ?? 16,
           color: textColor,
-          weight: FontWeight.w400
+          weight: weight ?? FontWeight.w400,
         ),
         Material(
           color: Colors.transparent,
           child: InkWell(
             onTap: onClick,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              padding: EdgeInsets.symmetric(horizontal: spacing ?? 8.0),
               child: SText(
                 text: textButton,
-                size: 16,
+                size: size ?? 16,
                 color: textButtonColor,
                 weight: FontWeight.w900
               ),

@@ -26,7 +26,7 @@ final Uri policies = Uri(
   scheme: "https",
   host: "serchservice.com",
   path: "/",
-  query: encodeQueryParameters(<String, String>{
+  query: WebFunctions.encodeQueryParameters(<String, String>{
       'subject': 'Example Subject & Symbols are allowed!',
     }),
 );
@@ -34,7 +34,7 @@ final Uri policies = Uri(
 final Uri emailLaunchUri = Uri(
     scheme: 'mailto',
     path: 'smith@example.com',
-    query: encodeQueryParameters(<String, String>{
+    query: WebFunctions.encodeQueryParameters(<String, String>{
       'subject': 'Example Subject & Symbols are allowed!',
     }),
   );

@@ -1,44 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 import 'package:provide/lib.dart';
 
-class ChooseServiceScreen extends StatefulWidget {
+class ChooseServiceScreen extends StatelessWidget {
   const ChooseServiceScreen({super.key});
 
   @override
-  State<ChooseServiceScreen> createState() => _ChooseServiceScreenState();
-}
-
-class _ChooseServiceScreenState extends State<ChooseServiceScreen> {
-  @override
   Widget build(BuildContext context) {
-    String userFirstName = Provider.of<UserInformation>(context, listen: false).user.firstName ?? "";
+    UserInformationModel data = HiveUserDatabase().getProfileData();
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: screenPadding,
-          child: Column(
-            children: [
-              const SizedBox(height: 40),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      body: Padding(
+        padding: screenPadding,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    SText(
-                      text: "Welcome $userFirstName,",
-                      color: Theme.of(context).focusColor,
-                      size: 24,
-                      weight: FontWeight.w900,
-                    ),
-                    const SizedBox(height: 5),
-                    SText(
-                      text: "Get paid on your own terms by doing what you know and love doing.",
-                      color: Theme.of(context).primaryColorLight,
-                      size: 16,
+                    Image.asset(
+                      SImages.logo,
+                      width: 35,
+                      color: Theme.of(context).primaryColor,
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                SText(
+                  text: "Welcome ${data.firstName},",
+                  color: Theme.of(context).focusColor,
+                  size: 26,
+                  weight: FontWeight.w900,
+                ),
+                const SizedBox(height: 5),
+                SText(
+                  text: "Get paid on your own terms by doing what you know and love doing.",
+                  color: Theme.of(context).primaryColorLight,
+                  size: 18,
+                ),
+                const SizedBox(height: 30),
                 SText.center(
                   text: "Pick a service you are good with...",
                   color: Theme.of(context).primaryColorLight,
@@ -58,11 +60,6 @@ class _ChooseServiceScreenState extends State<ChooseServiceScreen> {
                       image: SImages.plumber
                     ),
                     SServiceCard(
-                      title: "Barber",
-                      value: Services.barber,
-                      image: SImages.barber
-                    ),
-                    SServiceCard(
                       title: "Mechanic",
                       value: Services.mechanic,
                       image: SImages.mechanic
@@ -70,15 +67,25 @@ class _ChooseServiceScreenState extends State<ChooseServiceScreen> {
                   ],
                 ),
                 const SizedBox(height: 20),
+              ],
+            ),
+            Column(
+              children: [
                 SButtonText(
                   text: "Not sure on what skill to provide?",
                   textButton: "Skip this section for now",
                   onClick: () => Get.to(() => const AdditionalScreen()),
                   textColor: Theme.of(context).primaryColorLight,
                   textButtonColor: SColors.lightPurple,
+                ),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: Image.asset(SImages.tagline, width: 150, color: Theme.of(context).primaryColor),
                 )
-            ],
-          ),
+              ],
+            )
+          ],
         ),
       )
     );

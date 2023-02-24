@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provide/lib.dart';
-import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -15,13 +15,29 @@ class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   final email = TextEditingController();
   final password = TextEditingController();
-  bool showP = true;
+  bool showP = true, loading = false;
 
   Future login() async {
-    _formKey.currentState!.save();
-    // final auth = Provider.of<Auth>(context, listen: false);
-    // auth.logIn(password: password.text.trim(), email: email.text.trim());
+    if(!_formKey.currentState!.validate()) return;
+    try {
+      setState(() => loading = true);
+      _formKey.currentState!.save();
+      await supabase.auth.signInWithPassword(
+        password: password.text.trim(),
+        email: email.text.trim()
+      );
+      setState(() => loading = false);
+      Get.offAll(() => const BottomNavigator());
+    } on AuthException catch (e) {
+      showGetSnackbar(
+        message: e.message,
+        type: Popup.error,
+        duration: const Duration(seconds: 3)
+      );
+      setState(() => loading = false);
+    }
   }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -51,6 +67,13 @@ class _LoginFormState extends State<LoginForm> {
               labelText: "johndoe@gmail.com",
               formName: "Email Address",
               controller: email,
+              validate: (value) {
+                if(value!.isEmpty){
+                  return "Email address field is empty";
+                } else {
+                  return null;
+                }
+              },
               cursorColor: Theme.of(context).scaffoldBackgroundColor,
               fillColor: Theme.of(context).primaryColor,
               formStyle: STexts.authForm(context),
@@ -61,6 +84,13 @@ class _LoginFormState extends State<LoginForm> {
               labelText: "Enter your strong password",
               formName: "Password",
               controller: password,
+              validate: (value) {
+                if(value!.isEmpty){
+                  return "Password field is empty";
+                } else {
+                  return null;
+                }
+              },
               obscureText: showP,
               icon: showP ? CupertinoIcons.eye_slash_fill : CupertinoIcons.eye_fill,
               onPressed: () => setState(() => showP = !showP),
@@ -82,16 +112,14 @@ class _LoginFormState extends State<LoginForm> {
               ],
             ),
             const SizedBox(height: 40),
-            Consumer<Auth>(
-              builder:(context, auth, child) => SButton(
-                text: "Log me In",
-                width: width,
-                loading: auth.isLoading,
-                onClick: () => login(),
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                textWeight: FontWeight.bold,
-                textSize: 18
-              ),
+            SButton(
+              text: "Log me In",
+              width: width,
+              loading: loading,
+              onClick: () => login(),
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              textWeight: FontWeight.bold,
+              textSize: 18
             ),
             const SizedBox(height: 20),
             SButtonText(

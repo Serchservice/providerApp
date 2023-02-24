@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:provide/lib.dart';
 // import 'package:google_nav_bar/google_nav_bar.dart';
 
 // List<Widget> navPages = [
@@ -49,29 +48,3 @@ List<GButton> shortChatTabs = const [
   GButton(icon: CupertinoIcons.settings),
   GButton(icon: CupertinoIcons.person_crop_circle_fill_badge_plus),
 ];
-
-List<Widget> chatPages = [
-  const AllCallHistoryScreen(),
-  const ReceivedCallHistoryScreen(),
-  const OutgoingCallHistoryScreen(),
-  const MissedCallHistoryScreen(),
-];
-
-int chatPageCount = chatPages.length;
-
-List<Widget> callHistory = [
-  const HistoryAllCallScreen(),
-  const HistoryVoiceCallScreen(),
-  const HistoryVideoCallScreen(),
-  const HistoryT2FCallScreen()
-];
-
-int callHistoryCount = callHistory.length;
-
-List<Widget> userProfile = [
-  const UserProfileAll(),
-  const UserProfileImages(),
-  const UserProfileVideos()
-];
-
-int userProfileCount = userProfile.length;

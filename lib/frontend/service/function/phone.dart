@@ -24,7 +24,7 @@ Future pickImage({required context, required ImageSource source}) async {
       if(image == null){
         return;
       } else {
-        Navigator.of(context).push(ViewPickedImage.route(image: image.path));
+        Navigator.of(context).push(ViewPickedImage.route(image: image.path, file: image));
       }
     } else if(Platform.isIOS || permitStatus.isPermanentlyDenied || permitStatus.isDenied){
       showGetSnackbar(
@@ -34,7 +34,7 @@ Future pickImage({required context, required ImageSource source}) async {
       );
     }
   } on PlatformException catch (e) {
-    debugShow(e);
+    showGetSnackbar(message: e.message ?? "Error occurred", type: Popup.error);
   }
 }
 
@@ -43,32 +43,38 @@ Future pickFile({
 }) async {
   try{
     PermissionStatus permitStatus;
-    permitStatus = await Permission.storage.request();
+    if(Platform.isAndroid){
+      permitStatus = await Permission.storage.request();
+    } else {
+      permitStatus = await Permission.photos.request();
+    }
 
     if(permitStatus.isGranted){
       final file = await FilePicker.platform.pickFiles(
         type: type,
         allowMultiple: allowMultiple,
-        allowedExtensions: allowedExtensions
+        allowedExtensions: allowedExtensions,
+        withData: true,
+        withReadStream: true
       );
-      if(file != null && allowMultiple == false){
+      if(file == null){
+        return;
+      }else if(allowMultiple == false){
         final image = file.files.first;
-        Navigator.of(context).push(ViewPickedImage.route(image: image.path!));
-      } else if(allowMultiple == true && file != null){
+        if(image.path == null) {
+          return;
+        } else {
+          Navigator.of(context).push(ViewPickedImage.route(image: image.path!, imageFile: image));
+        }
+      } else if(allowMultiple == true){
         Navigator.of(context).push(ViewPickedFiles.route(
           files: file.files,
           onDependFile: openFile
         ));
       }
     }
-
-    // if(Platform.isAndroid){
-    //   permitStatus = await Permission.storage.request();
-    // } else {
-    //   permitStatus = await Permission.photos.request();
-    // }
   } on PlatformException catch (e){
-    debugShow(e);
+    showGetSnackbar(message: e.message ?? "Error occurred", type: Popup.error);
   }
 }
 

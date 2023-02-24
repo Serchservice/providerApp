@@ -32,11 +32,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 Padding(
                   padding: horizontalPadding,
-                  child: Image.asset(SImages.login, height: 200,),
+                  child: Image.asset(SImages.loginImage, height: 200,),
                 ),
-                // LottieBuilder.network(
-                //   "https://assets10.lottiefiles.com/packages/lf20_pwwZiL9I3Y.json"
-                // ),
                 const LoginForm(),
               ],
             )

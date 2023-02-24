@@ -2,19 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provide/lib.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CentreScreen extends StatefulWidget {
-  final bool finishSignup;
-  final String service;
-  final String gender;
-  final String phone;
   final bool verified;
-  final Country selectedCountry;
-  final String userAmount;
-  const CentreScreen({
-    super.key, required this.finishSignup, required this.service, required this.verified, required this.phone,
-    required this.selectedCountry, required this.userAmount, required this.gender
-  });
+  const CentreScreen({super.key, required this.verified});
 
   @override
   State<CentreScreen> createState() => _CentreScreenState();
@@ -22,12 +14,47 @@ class CentreScreen extends StatefulWidget {
 
 class _CentreScreenState extends State<CentreScreen> {
   ScrollController scroll = ScrollController();
+  UserAdditionalModel userAdditionalModel = HiveUserDatabase().getAdditionalData();
+  UserInformationModel userInformationModel = HiveUserDatabase().getProfileData();
+  late final Stream<UserInformationModel> _moneyStream;
   bool showMe = false;
+  late int freeTrialDuration;
+
   void openPermissions() {
     setState(() => showMe = !showMe);
     if(showMe == true){
-      scroll.animateTo(scroll.position.maxScrollExtent, duration: const Duration(seconds: 1), curve: Curves.easeOut);
+      scroll.animateTo(
+        scroll.position.maxScrollExtent,
+        duration: const Duration(seconds: 1),
+        curve: Curves.easeOut
+      );
     }
+  }
+
+  void getFreeTrialDuration() async {
+    try {
+      final result = await supabase.from(Supa().serviceAndPlan).select().eq("serchID", userInformationModel.serchID).single() as Map;
+      // Convert the string representation of the created_at timestamp to a DateTime object
+      DateTime createdAtDate = TimeFormatter.supabaseDateParser.parse(result["created_at"]);
+      // Get the current date and time
+      DateTime now = DateTime.now();
+      // Calculate the difference in days between the created_at timestamp and the current date
+      freeTrialDuration = 13 - now.difference(createdAtDate).inDays;
+    } on PostgrestException catch (e) {
+      freeTrialDuration = 0;
+      showGetSnackbar(message: e.message, type: Popup.error);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getFreeTrialDuration();
+    Initializers().getRateLists(userInformationModel);
+
+    _moneyStream = supabase.from(Supa().profile).stream(primaryKey: ['id']).eq("serchAuth", userInformationModel.serchAuth).map(
+      (maps) => maps.map((map) => UserInformationModel.fromMap(map)).toList()
+    ).map((list) => list.first);
   }
 
   @override
@@ -38,21 +65,16 @@ class _CentreScreenState extends State<CentreScreen> {
         SliverAppBar.medium(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           flexibleSpace: const CentreProfile(),
-          expandedHeight: 190,
+          expandedHeight: 200,
+          collapsedHeight: 80,
         ),
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
           sliver: SliverToBoxAdapter(
             child: Column(
               children: [
-                CentreOtherProfile(selectedCountry: widget.selectedCountry),
+                const CentreOtherProfile(),
                 const SizedBox(height: 10,),
-                //User selected Service and other information
-                // SUPB(
-                //   service: widget.service,
-                //   gender: widget.gender,
-                //   phone: widget.phone
-                // ),
 
                 //Email Verification
                 if (widget.verified == false) Column(
@@ -62,7 +84,7 @@ class _CentreScreenState extends State<CentreScreen> {
                       color: SColors.lightPurple,
                       borderRadius: BorderRadius.circular(5),
                       child: InkWell(
-                        onTap: () => openMail(),
+                        onTap: () => WebFunctions.openMail(),
                         child: Container(
                           padding: screenPadding,
                           child: Row(
@@ -93,7 +115,7 @@ class _CentreScreenState extends State<CentreScreen> {
                 ),
 
                 //Checking if user skipped additional information verification
-                if (widget.finishSignup == false) Column(
+                if (userAdditionalModel.nokFirstName.isEmpty) Column(
                   children: [
                     const SizedBox(height: 10,),
                     Material(
@@ -125,37 +147,51 @@ class _CentreScreenState extends State<CentreScreen> {
                   color: Theme.of(context).backgroundColor,
                   borderRadius: BorderRadius.circular(5),
                   child: InkWell(
-                    onTap: () => Get.to(() => Tip2FixWalletScreen(userAmount: widget.userAmount)),
+                    onTap: () => Get.to(() => const Tip2FixWalletScreen()),
                     child: Container(
                       padding: screenPadding,
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Image.asset(SImages.wallet, width: 50,),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    const SText(
-                                      text: "T2F Earnings: ",
-                                      size: 18,
-                                      weight: FontWeight.bold,
-                                      color: Scolors.info
-                                    ),
-                                    SText(
-                                      text: widget.userAmount,
-                                      size: 18,
-                                      weight: FontWeight.bold,
-                                      color: Scolors.info
-                                    ),
-                                  ]
+                                StreamBuilder<UserInformationModel>(
+                                  stream: _moneyStream,
+                                  builder: (context, snapshot) {
+                                    if(snapshot.hasData) {
+                                      final money = snapshot.data!;
+                                      return Text(
+                                        // "₦${plan.price}",
+                                        "T2F Earnings: ${CurrencyFormatter.formatter.format(double.parse(money.balance))}",
+                                        style: const TextStyle(
+                                          fontFamily: "",
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                          color: Scolors.info
+                                        ),
+                                      );
+                                    } else {
+                                      return Text(
+                                        // "₦${plan.price}",
+                                        "T2F Earnings: ${CurrencyFormatter.formatter.format(double.parse(userInformationModel.balance))}",
+                                        style: const TextStyle(
+                                          fontFamily: "",
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                          color: Scolors.info
+                                        ),
+                                      );
+                                    }
+                                  }
                                 ),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    SText(
+                                    SText.right(
                                       text: "Tap this box to view your wallet",
                                       size: 12,
                                       color: Theme.of(context).primaryColor
@@ -194,6 +230,20 @@ class _CentreScreenState extends State<CentreScreen> {
                 ),
                 const SizedBox(height: 10,),
                 SetTab(
+                  settingHeader: "My Serch Plan",
+                  settingDetail: "Your subscription plan and how to change it.",
+                  prefixIcon: Icons.subscriptions_outlined,
+                  onPressed: () => Get.to(() => SubscriptionScreen(freeTrialDuration: freeTrialDuration,))
+                ),
+                const SizedBox(height: 10,),
+                SetTab(
+                  settingHeader: "My Bookmarkers",
+                  settingDetail: "Continue the conversation with who bookmarked you.",
+                  prefixIcon: Icons.bookmarks_outlined,
+                  onPressed: () => Get.to(() => const BookmarkerScreen())
+                ),
+                const SizedBox(height: 10,),
+                SetTab(
                   settingHeader: "Referral tree",
                   settingDetail: "Your referrals and how big of a family you have.",
                   prefixIcon: CupertinoIcons.group,
@@ -207,13 +257,13 @@ class _CentreScreenState extends State<CentreScreen> {
                   onPressed: () => Get.to(() => const RequestAccountInfoScreen())
                 ),
                 const SizedBox(height: 10,),
-                // SetTab(
-                //   settingHeader: "Generate skill certificate",
-                //   settingDetail: "Generate a reusable certificate for any place",
-                //   prefixIcon: Icons.file_download,
-                //   onPressed: () => Get.to(() => const GenerateCertificateScreen())
-                // ),
-                // const SizedBox(height: 10,),
+                SetTab(
+                  settingHeader: "Skill certificate",
+                  settingDetail: "Generate a reusable certificate for any place",
+                  prefixIcon: Icons.file_present_outlined,
+                  onPressed: () => Get.to(() => const GenerateCertificateScreen())
+                ),
+                const SizedBox(height: 10,),
                 SetTab(
                   prefixIcon: CupertinoIcons.power,
                   settingHeader: "Sign Out",
@@ -228,9 +278,7 @@ class _CentreScreenState extends State<CentreScreen> {
                   onPressed: () => Get.to(() => const DeleteMyAccountScreen()),
                   // onPressed: () => openDeleteAccount(context)
                 ),
-                const SizedBox(height: 10,),
-
-                const SizedBox(height: 40),
+                const SizedBox(height: 50),
                 Container(
                   padding: const EdgeInsets.all(6.0),
                   decoration: BoxDecoration(
@@ -282,9 +330,7 @@ class _CentreScreenState extends State<CentreScreen> {
                 Container(),
 
                 const SizedBox(height: 40),
-                Center(
-                  child: Image.asset(SImages.logoName, width: 130, color: Theme.of(context).primaryColor,),
-                ),
+                Center(child: Image.asset(SImages.logoName, width: 130, color: Theme.of(context).primaryColor)),
                 const SizedBox(height: 40),
               ]
             ),

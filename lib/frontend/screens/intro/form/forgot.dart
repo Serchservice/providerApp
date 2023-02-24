@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provide/lib.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ForgotPasswordForm extends StatefulWidget {
   const ForgotPasswordForm({super.key});
@@ -11,6 +12,32 @@ class ForgotPasswordForm extends StatefulWidget {
 
 class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
   final _formKey = GlobalKey<FormState>();
+  final email = TextEditingController();
+  bool loading = false;
+
+  void sendPasswordResetInformation() async {
+    if(!_formKey.currentState!.validate()) return;
+    try {
+      setState(() => loading = true);
+      _formKey.currentState!.save();
+      await supabase.auth.resetPasswordForEmail(email.text.trim());
+      showGetSnackbar(
+        message: "We have sent you reset instructions in your email address",
+        type: Popup.success,
+        duration: const Duration(seconds: 3)
+      );
+      setState(() => loading = false);
+      Get.offAll(() => ConfirmPasswordScreen(email: email.text.trim(),));
+    } on AuthException catch (e) {
+      showGetSnackbar(
+        message: e.message,
+        type: Popup.error,
+        duration: const Duration(seconds: 3)
+      );
+      setState(() => loading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -42,9 +69,17 @@ class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
             SFormField(
               labelText: "johndoe@gmail.com",
               formName: "Email Address",
+              controller: email,
               cursorColor: Theme.of(context).scaffoldBackgroundColor,
               fillColor: Theme.of(context).primaryColor,
               formStyle: STexts.authForm(context),
+              validate: (value) {
+                if(value!.isEmpty){
+                  return "Email address field is empty";
+                } else {
+                  return null;
+                }
+              },
               formColor: Theme.of(context).primaryColor,
               enabledBorderColor: Theme.of(context).backgroundColor,
             ),
@@ -54,8 +89,9 @@ class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
               width: width,
               textWeight: FontWeight.bold,
               textSize: 18,
+              loading: loading,
               padding: const EdgeInsets.all(15),
-              onClick: () => Get.offAll(() => const VerifyPasswordScreen()),
+              onClick: () => sendPasswordResetInformation(),
             ),
             const SizedBox(height: 40),
             SButtonText(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provide/lib.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UServiceCard extends StatefulWidget{
   final String title;
@@ -16,14 +17,27 @@ class UServiceCard extends StatefulWidget{
 }
 
 class _UServiceCardState extends State<UServiceCard> {
-  addplan(context) async {
-    await AuthIDB().addservice(
-      service: widget.value == Services.barber ? "Barber"
-      : widget.value == Services.electrician ? "Electrician"
-      : widget.value == Services.mechanic ? "Mechanic"
-      : "Plumber"
-    );
-    Get.offAll(() => const BottomNavigator());
+  bool loading = false;
+
+  Future<void> addplan(context) async {
+    setState(() => loading = true);
+    try{
+      final userID = supabase.auth.currentUser;
+      await supabase.from(Supa().profile).update({"service": widget.value == Services.electrician ? "Electrician"
+        : widget.value == Services.mechanic ? "Mechanic" : "Plumber"}).eq("serchAuth", userID!.id);
+      final result = await supabase.from(Supa().profile).select().eq("serchAuth", userID.id).single() as Map;
+      final serchData = UserInformationModel.fromJson(result as Map<String, dynamic>);
+      HiveUserDatabase().saveProfileData(serchData);
+      setState(() => loading = false);
+      Get.to(() => const BottomNavigator());
+    } on PostgrestException catch (e) {
+      showGetSnackbar(
+        message: e.message,
+        type: Popup.error,
+        duration: const Duration(seconds: 3)
+      );
+      setState(() => loading = false);
+    }
   }
 
   @override
@@ -35,7 +49,7 @@ class _UServiceCardState extends State<UServiceCard> {
         margin: const EdgeInsets.all(5.0),
         width: 100,
         decoration: BoxDecoration(
-          color: SColors.blue,
+          color: SColors.darkTheme1,
           borderRadius: BorderRadius.circular(5),
         ),
         child: Column(
@@ -44,13 +58,11 @@ class _UServiceCardState extends State<UServiceCard> {
             const SizedBox(height: 10),
             SText.center(text: widget.title, size: 18, weight: FontWeight.w900),
             const SizedBox(height: 10.0),
-            SText.center(
+            loading ? Center(child: SLoader.fallingDot(size: 55)) : SText.center(
               text: widget.title == "Electrician"
               ? "Enjoy more jobs on the go with your ${widget.title.toLowerCase().substring(0, 8)}al skills"
               : widget.title == "Plumber"
               ? "Enjoy more jobs on the go with your ${widget.title.toLowerCase().substring(0, 5)}ing skills"
-              : widget.title == "Barber"
-              ? "Enjoy more jobs on the go with your ${widget.title.toLowerCase().substring(0, 4)}ing skills"
               : "Enjoy more jobs on the go with your ${widget.title.toLowerCase()} skills"
             ),
           ],
@@ -60,52 +72,49 @@ class _UServiceCardState extends State<UServiceCard> {
   }
 }
 
-class UChooseServiceScreen extends StatefulWidget {
+class UChooseServiceScreen extends StatelessWidget {
   const UChooseServiceScreen({super.key});
 
   @override
-  State<UChooseServiceScreen> createState() => _UChooseServiceScreenState();
-}
-
-class _UChooseServiceScreenState extends State<UChooseServiceScreen> {
-
-  @override
-  void initState() {
-    super.initState();
-    SerchUser.getCurrentUserInfo();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    UserInformationModel data = HiveUserDatabase().getProfileData();
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: screenPadding,
-          child: Column(
-            children: [
-              const SizedBox(height: 40),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      body: Padding(
+        padding: screenPadding,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    SText(
-                      text: "Welcome ${currentUserInfo?.firstName},",
+                    Image.asset(
+                      SImages.logo,
+                      width: 35,
                       color: Theme.of(context).primaryColor,
-                      size: 24,
-                      weight: FontWeight.w900,
-                    ),
-                    const SizedBox(height: 5),
-                    const SText(
-                      text: "Get paid on your own terms by doing what you know and love doing.",
-                      color: SColors.hint,
-                      size: 16,
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
-                const SText.center(
-                  text: "What service would be providing for us?",
-                  color: SColors.hint,
+                SText(
+                  text: "Welcome ${data.firstName},",
+                  color: Theme.of(context).focusColor,
+                  size: 26,
+                  weight: FontWeight.w900,
+                ),
+                const SizedBox(height: 5),
+                SText(
+                  text: "Get paid on your own terms by doing what you know and love doing.",
+                  color: Theme.of(context).primaryColorLight,
+                  size: 18,
+                ),
+                const SizedBox(height: 30),
+                SText.center(
+                  text: "Pick a service you are good with...",
+                  color: Theme.of(context).primaryColorLight,
                   size: 18,
                 ),
                 const SizedBox(height: 20),
@@ -114,28 +123,40 @@ class _UChooseServiceScreenState extends State<UChooseServiceScreen> {
                     UServiceCard(
                       title: "Electrician",
                       value: Services.electrician,
-                      image: SImages.logo
+                      image: SImages.electrician
                     ),
                     UServiceCard(
                       title: "Plumber",
                       value: Services.plumber,
-                      image: SImages.logo
-                    ),
-                    UServiceCard(
-                      title: "Barber",
-                      value: Services.barber,
-                      image: SImages.logo
+                      image: SImages.plumber
                     ),
                     UServiceCard(
                       title: "Mechanic",
                       value: Services.mechanic,
-                      image: SImages.logo
+                      image: SImages.mechanic
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
-            ],
-          ),
+              ],
+            ),
+            Column(
+              children: [
+                SButtonText(
+                  text: "Not sure on what skill to provide?",
+                  textButton: "Skip this section for now",
+                  onClick: () => Get.to(() => const AdditionalScreen()),
+                  textColor: Theme.of(context).primaryColorLight,
+                  textButtonColor: SColors.lightPurple,
+                ),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: Image.asset(SImages.tagline, width: 150, color: Theme.of(context).primaryColor),
+                )
+              ],
+            )
+          ],
         ),
       )
     );

@@ -28,7 +28,7 @@ abstract class SColors{
   ///Light Colors
   static const lightTheme = Colors.white;
   static const lightTheme1 = Color(0xffFDFDFD);
-  static const lightTheme2 = Color(0xffF0F0F0);
+  static const lightTheme2 = Color(0xFFF4F4F4);
   static const lightTheme3 = Color(0xffD5D5D5);
   static const lightTheme4 = Color(0xffBCBCBC);
 
@@ -40,8 +40,8 @@ abstract class SColors{
   static const red = Color(0xffB80000);
   static const yellow = Color(0xffBC5505);
   static const rate = Color(0xffFDCC0D);
-  static const shimmerBase = Color.fromARGB(255, 71, 71, 71);
-  static const shimmerHigh = Color.fromARGB(255, 64, 64, 64);
+  static const shimmerBase = Color.fromARGB(255, 176, 176, 176);
+  static const shimmerHigh = Color.fromARGB(255, 210, 210, 210);
   static const shimmer = Color(0xFF111111);
   static const grey = Color(0xff383838);
   static const enabledBorderDark = Color.fromARGB(255, 16, 16, 16);

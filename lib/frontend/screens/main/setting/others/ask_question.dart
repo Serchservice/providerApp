@@ -29,26 +29,22 @@ class _AskQuestionScreenState extends State<AskQuestionScreen> {
           return StatefulBuilder(
             builder: (context, setState) {
               return AlertDialog(
-                backgroundColor: Theme.of(context).bottomAppBarColor,
-                elevation: 0,
-                title: SText(
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                title: SText.center(
                   text: "Are you sure you want to discard this issue?",
-                  color: Theme.of(context).primaryColor, size: 16
+                  size: 18,
+                  weight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
                 ),
                 actions: [
                   SBtn(
+                    onClick: () => Get.offUntil(GetPageRoute(page: () => const FAQSettingScreen()), (route) => false),
                     text: "Discard", textSize: 14,
-                    buttonColor: Theme.of(context).bottomAppBarColor,
-                    textColor: SColors.lightPurple,
-                    onClick: () => Get.offUntil(GetPageRoute(page: () => const FAQSettingScreen()), (route) => false)
                   ),
-                  SBtn(
-                    text: "Back to editing", textSize: 14,
-                    onClick: () => Navigator.of(context).pop(false),
-                    buttonColor: Theme.of(context).bottomAppBarColor,
-                    textColor: SColors.lightPurple,
-                  )
+                  SBtn(onClick: () => Navigator.of(context).pop(false), text: "Back to Editing", textSize: 14,)
                 ],
+                actionsPadding: const EdgeInsets.symmetric(vertical: 5),
+                actionsAlignment: MainAxisAlignment.center,
               );
             }
           );
@@ -70,26 +66,22 @@ class _AskQuestionScreenState extends State<AskQuestionScreen> {
           return StatefulBuilder(
             builder: (context, setState) {
               return AlertDialog(
-                backgroundColor: Theme.of(context).bottomAppBarColor,
-                elevation: 0,
-                title: SText(
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                title: SText.center(
                   text: "Are you sure you want to discard this issue?",
-                  color: Theme.of(context).primaryColor, size: 16
+                  size: 18,
+                  weight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
                 ),
                 actions: [
                   SBtn(
+                    onClick: () => Get.offUntil(GetPageRoute(page: () => const FAQSettingScreen()), (route) => false),
                     text: "Discard", textSize: 14,
-                    buttonColor: Theme.of(context).bottomAppBarColor,
-                    textColor: SColors.lightPurple,
-                    onClick: () => Get.offUntil(GetPageRoute(page: () => const FAQSettingScreen()), (route) => false)
                   ),
-                  SBtn(
-                    text: "Back to editing", textSize: 14,
-                    onClick: () => Navigator.of(context).pop(false),
-                    buttonColor: Theme.of(context).bottomAppBarColor,
-                    textColor: SColors.lightPurple,
-                  )
+                  SBtn(onClick: () => Navigator.of(context).pop(false), text: "Back to Editing", textSize: 14,)
                 ],
+                actionsPadding: const EdgeInsets.symmetric(vertical: 5),
+                actionsAlignment: MainAxisAlignment.center,
               );
             }
           );

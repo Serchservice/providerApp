@@ -27,8 +27,9 @@ class Biometrics{
       final status = await auth.authenticate(
         localizedReason: "Scan your fingerprint to authenticate",
         options: const AuthenticationOptions(
-          useErrorDialogs: true,
-          stickyAuth: true
+          useErrorDialogs: false,
+          stickyAuth: true,
+          biometricOnly: true
         ),
         authMessages: const <AuthMessages>[
           AndroidAuthMessages(

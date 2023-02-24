@@ -15,11 +15,11 @@ enum NotifyPopup{
 }
 
 
-Future getPage(NotifyPopup notify, context, ChatModel chatModel) {
+Future getPage(NotifyPopup notify, context) {
   if(notify == NotifyPopup.message){
-    return Navigator.of(context).push(UserChattingScreen.route(chatModel.id, chatModel));
+    return Navigator.of(context).push(UserChattingScreen.route("chatModel.id"));
   } else {
-    return Navigator.of(context).push(UserChattingScreen.route(chatModel.id, chatModel));
+    return Navigator.of(context).push(UserChattingScreen.route("chatModel.id"));
   }
   // switch (notify) {
   //   case NotifyPopup.message:

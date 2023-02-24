@@ -4,6 +4,7 @@ class SImages{
   static const logoNameGif = "asset/logo/serchname.gif";
   static const logoGif = "asset/logo/serchloader.gif";
   static const logoAllGif = "asset/logo/serchall.gif";
+  static const tagline = "asset/logo/serviceMadeEasy.png";
 
   static const bottomSlime = "asset/flare/bottomSlime.flr";
   static const topSlime = "asset/flare/topSlime.flr";
@@ -68,6 +69,32 @@ class SImages{
   static const centreBg = "asset/anim/bg.jpg";
   static const centreOne = "asset/anim/backg.jpg";
   static const creditCard = "asset/anim/blued.jpg";
+
+  //Payment
+  static const mastercard = "asset/plan/mastercard.png";
+  static const discover = "asset/plan/discover.png";
+  static const visa = "asset/plan/visa.png";
+  static const dollar = "asset/plan/dollar.png";
+  static const chip = "asset/plan/chip.png";
+  static const serchAllDay = "asset/plan/serchAllDay.png";
+  static const serchFree = "asset/plan/serchFree.png";
+  static const serchPremium = "asset/plan/serchPremium.png";
+  static const checked = "asset/plan/checked.png";
+
+  //Auth Images
+  static const loginImage = 'asset/services/login.png';
+  static const fingerPrintSuccess = "asset/services/finger-print-lock-success.gif";
+  static const fingerPrintFail = "asset/services/finger-print-fail.gif";
+  static const successDone = "asset/services/successfully-done.gif";
+  static const passwordReset = "asset/services/password.png";
+  static const password = "asset/services/padlock.png";
+  static const openGiftBox = "asset/services/openGiftBox.gif";
+
+  //Others
+  static const certificate = "asset/services/Certificate.png";
+  static const award = "asset/services/award.png";
+  static const swirl = "asset/services/swirl.png";
+  static const signature = "asset/services/signature.png";
 }
 
 String flagImage(String image) => "asset/flags/$image.png";

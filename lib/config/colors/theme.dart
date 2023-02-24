@@ -9,7 +9,7 @@ abstract class STheme{
     brightness: Brightness.light,
     colorScheme: const ColorScheme.light(),
     visualDensity: visualDensity,
-    textTheme: GoogleFonts.dmSansTextTheme().apply(bodyColor: SColors.black),
+    textTheme: GoogleFonts.ubuntuTextTheme().apply(bodyColor: SColors.black),
     scaffoldBackgroundColor: SColors.lightTheme,
     iconTheme: const IconThemeData(color: SColors.light),
     bottomAppBarColor: SColors.lightColor,

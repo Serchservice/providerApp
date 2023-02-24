@@ -10,30 +10,28 @@ import 'package:provide/lib.dart';
 class HiveStorage{
   var path = Directory.current.path;
 
-  Future<Directory> getDirectory() async {
-    Directory? directory = await getExternalStorageDirectory();
-    const String pathExt = '/serchDb/';
-    Directory newDirectory = Directory(directory!.path + pathExt);
-    if (await newDirectory.exists() == false) {
-      return newDirectory.create(recursive: true);
-    }
-    return newDirectory;
-  }
+  // Future<Directory> getDirectory() async {
+  //   Directory? directory = await getExternalStorageDirectory();
+  //   const String pathExt = '/serchDb/';
+  //   Directory newDirectory = Directory(directory!.path + pathExt);
+  //   if (await newDirectory.exists() == false) {
+  //     return newDirectory.create(recursive: true);
+  //   }
+  //   return newDirectory;
+  // }
 
   Future<void> init() async {
     Directory directory = await getApplicationDocumentsDirectory();
     await Hive.initFlutter();
-    final collections = await BoxCollection.open(
+    await BoxCollection.open(
       "SerchDb", //Name of database
-      {
-        SharedBoxes().permissions, SharedBoxes().preferences, SharedBoxes().connection
-      }, //Name of boxes
+      {SharedBoxes().permissions, SharedBoxes().preferences, SharedBoxes().connection, SharedBoxes().database}, //Name of boxes
       path: directory.path
     );
     await Hive.openBox(SharedBoxes().permissions);
     await Hive.openBox(SharedBoxes().preferences);
     await Hive.openBox(SharedBoxes().connection);
-    debugShow(collections.name);
+    await Hive.openBox(SharedBoxes().database);
   }
 }
 
@@ -222,221 +220,70 @@ class UserPermissions{
     }
   }
 }
-// class UserSharedPermits{
-//   //Biometrics Handling
-//   bool getBiometrics(){
-//     final permitJson = SharedKeys().getStorage.read("biometrics");
-//     final permits = PermitModel.fromJson(json.decode(permitJson));
-//     if(permits.hasBiometrics == false || permits.hasBiometrics == null){
-//       return false;
-//     } else {
-//       return true;
-//     }
-//   }
 
-//   void saveBiometricsMode(bool biometric){
-//     final model = PermitModel(hasBiometrics: biometric);
-//     final permitJson = json.encode(model.toJson());
-//     debugShow(permitJson);
-//     SharedKeys().getStorage.changes.update("biometrics", (value) => biometric);
-//   }
+class UserConnection{
+  final connect = Hive.box(SharedBoxes().connection);
 
-//   //For ChatNotification Handling
-//   bool getChatNotification(){
-//     final permitJson = SharedKeys().getStorage.read(SharedKeys().theme);
-//     final permits = PermitModel.fromJson(json.decode(permitJson));
-//     if(permits.chatNotify == false || permits.chatNotify == null){
-//       return false;
-//     } else {
-//       return true;
-//     }
-//   }
+  //HasRequestShare 1
+  bool getHasRequestShare() {
+    final result = connect.get(1);
+    if(result == null){
+      return false;
+    } else {
+      final newJson = UserServiceModel.fromJson(json.decode(result));
+      if(newJson.hasRequestShare == null || newJson.hasRequestShare == false){
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
 
-//   void saveChatNotificationMode(PermitModel model){
-//     final permitJson = json.encode(model.toJson());
-//     SharedKeys().getStorage.write(SharedKeys().theme, permitJson);
-//   }
+  void saveHasRequestShare(bool hasRequestShare) {
+    final requestShare = UserServiceModel(hasRequestShare: hasRequestShare);
+    final newJson = json.encode(requestShare.toJson());
+    connect.put(1, newJson);
+  }
 
-//   //For CallNotification Handling
-//   bool getCallNotification(){
-//     final permitJson = SharedKeys().getStorage.read(SharedKeys().theme);
-//     final permits = PermitModel.fromJson(json.decode(permitJson));
-//     if(permits.callNotify == false || permits.callNotify == null){
-//       return false;
-//     } else {
-//       return true;
-//     }
-//   }
+  //OnRequestShare 2
+  bool getOnRequestShare() {
+    final result = connect.get(2);
+    if(result == null){
+      return false;
+    } else {
+      final newJson = UserServiceModel.fromJson(json.decode(result));
+      if(newJson.onRequestShare == null || newJson.onRequestShare == false){
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
 
-//   void saveCallNotificationMode(PermitModel model){
-//     final permitJson = json.encode(model.toJson());
-//     SharedKeys().getStorage.write(SharedKeys().theme, permitJson);
-//   }
+  void saveOnRequestShare(bool onRequestShare) {
+    final requestShare = UserServiceModel(onRequestShare: onRequestShare);
+    final newJson = json.encode(requestShare.toJson());
+    connect.put(2, newJson);
+  }
 
-//   //For OtherNotification Handling
-//   bool getOtherNotification(){
-//     final permitJson = SharedKeys().getStorage.read(SharedKeys().theme);
-//     final permits = PermitModel.fromJson(json.decode(permitJson));
-//     if(permits.otherNotify == false || permits.otherNotify == null){
-//       return false;
-//     } else {
-//       return true;
-//     }
-//   }
+  //OnTripStatus 3
+  bool getOnTrip() {
+    final result = connect.get(3);
+    if(result == null){
+      return false;
+    } else {
+      final newJson = UserServiceModel.fromJson(json.decode(result));
+      if(newJson.onTrip == null || newJson.onTrip == false){
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
 
-//   void saveOtherNotificationMode(PermitModel model){
-//     final permitJson = json.encode(model.toJson());
-//     SharedKeys().getStorage.write(SharedKeys().theme, permitJson);
-//   }
-
-//   //For ShowOnMap Handling
-//   bool getShowOnMap(){
-//     final permitJson = SharedKeys().getStorage.read(SharedKeys().theme);
-//     final permits = PermitModel.fromJson(json.decode(permitJson));
-//     if(permits.showOnMap == false || permits.showOnMap == null){
-//       return false;
-//     } else {
-//       return true;
-//     }
-//   }
-
-//   void saveShowOnMapMode(PermitModel model){
-//     final permitJson = json.encode(model.toJson());
-//     SharedKeys().getStorage.write(SharedKeys().theme, permitJson);
-//   }
-
-//   //For ShowAppBadge Handling
-//   bool getShowAppBadge(){
-//     final permitJson = SharedKeys().getStorage.read(SharedKeys().theme);
-//     final permits = PermitModel.fromJson(json.decode(permitJson));
-//     if(permits.showAppBadge == false || permits.showAppBadge == null){
-//       return false;
-//     } else {
-//       return true;
-//     }
-//   }
-
-//   void saveShowAppBadgeMode(PermitModel model){
-//     final permitJson = json.encode(model.toJson());
-//     SharedKeys().getStorage.write(SharedKeys().theme, permitJson);
-//   }
-
-//   //For AlwaysOnline Handling
-//   bool getAlwaysOnline(){
-//     final permitJson = SharedKeys().getStorage.read(SharedKeys().theme);
-//     final permits = PermitModel.fromJson(json.decode(permitJson));
-//     if(permits.alwaysOnline == false || permits.alwaysOnline == null){
-//       return false;
-//     } else {
-//       return true;
-//     }
-//   }
-
-//   void saveAlwaysOnlineMode(PermitModel model){
-//     final permitJson = json.encode(model.toJson());
-//     SharedKeys().getStorage.write(SharedKeys().theme, permitJson);
-//   }
-
-//   //For SWM Handling
-//   bool getSWM(){
-//     final permitJson = SharedKeys().getStorage.read(SharedKeys().theme);
-//     final permits = PermitModel.fromJson(json.decode(permitJson));
-//     if(permits.onSWM == false || permits.onSWM == null){
-//       return false;
-//     } else {
-//       return true;
-//     }
-//   }
-
-//   void saveSWMMode(PermitModel model){
-//     final permitJson = json.encode(model.toJson());
-//     SharedKeys().getStorage.write(SharedKeys().theme, permitJson);
-//   }
-
-//   //For EmailSecure Handling
-//   bool getEmailSecure(){
-//     final permitJson = SharedKeys().getStorage.read(SharedKeys().theme);
-//     final permits = PermitModel.fromJson(json.decode(permitJson));
-//     if(permits.emailSecure == false || permits.emailSecure == null){
-//       return false;
-//     } else {
-//       return true;
-//     }
-//   }
-
-//   void saveEmailSecureMode(PermitModel model){
-//     final permitJson = json.encode(model.toJson());
-//     SharedKeys().getStorage.write(SharedKeys().theme, permitJson);
-//   }
-
-//   //For Photos Handling
-//   bool getPhotos(){
-//     final permitJson = SharedKeys().getStorage.read(SharedKeys().theme);
-//     final permits = PermitModel.fromJson(json.decode(permitJson));
-//     if(permits.photos == false || permits.photos == null){
-//       return false;
-//     } else {
-//       return true;
-//     }
-//   }
-
-//   void savePhotosMode(PermitModel model){
-//     final permitJson = json.encode(model.toJson());
-//     SharedKeys().getStorage.write(SharedKeys().theme, permitJson);
-//   }
-
-//   //For Location Permission
-//   LocationPermission getLocationPermit() {
-//     return isLocationGranted() ? LocationPermission.always : LocationPermission.denied;
-//   }
-
-//   bool isLocationGranted() {
-//     final permitJson = SharedKeys().getStorage.read(SharedKeys().theme);
-//     if(permitJson == false){
-//       return false;
-//     } else {
-//       final permits = PermitModel.fromJson(json.decode(permitJson));
-//       if(permits.location ==  null || permits.location == false){
-//         return false;
-//       } else {
-//         return true;
-//       }
-//     }
-//   }
-
-//   void saveLocationPermit(PermitModel model){
-//     final permitJson = json.encode(model.toJson());
-//     SharedKeys().getStorage.write(SharedKeys().theme, permitJson);
-//   }
-
-//   void changeLocationPermit() async {
-//     LocationPermission permission = await Geolocator.checkPermission();
-//     if(permission == LocationPermission.always){
-//       saveLocationPermit(PermitModel(location: true));
-//       if(permission == LocationPermission.denied){
-//         await Geolocator.requestPermission();
-//         if(permission == LocationPermission.always){
-//           saveLocationPermit(PermitModel(location: true));
-//         }
-//       } else if(permission == LocationPermission.deniedForever){
-//         await Geolocator.requestPermission();
-//         if(permission == LocationPermission.always){
-//           saveLocationPermit(PermitModel(location: true));
-//         }
-//       } else if(permission == LocationPermission.unableToDetermine){
-//         await Geolocator.openLocationSettings();
-//       } else {
-//         saveLocationPermit(PermitModel(location: true));
-//       }
-//     } else {
-//       saveLocationPermit(PermitModel(location: false));
-//     }
-//     // if(permission == LocationPermission.denied){
-//     //   await Geolocator.requestPermission();
-//     // } else if(permission == LocationPermission.deniedForever){
-//     //   await Geolocator.requestPermission();
-//     // } else if(permission == LocationPermission.unableToDetermine){
-//     //   await Geolocator.openLocationSettings();
-//     // } else 
-//   }
-// }
+  void saveOnTrip(bool onTrip) {
+    final onTripStatus = UserServiceModel(onTrip: onTrip);
+    final newJson = json.encode(onTripStatus.toJson());
+    connect.put(3, newJson);
+  }
+}

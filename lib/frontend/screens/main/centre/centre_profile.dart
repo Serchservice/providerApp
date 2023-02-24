@@ -1,8 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:provide/lib.dart';
-import 'package:provider/provider.dart';
 
 class CentreProfile extends StatefulWidget {
   const CentreProfile({super.key});
@@ -14,19 +14,11 @@ class CentreProfile extends StatefulWidget {
 class _CentreProfileState extends State<CentreProfile> {
   @override
   Widget build(BuildContext context) {
+    UserInformationModel userInformationModel = HiveUserDatabase().getProfileData();
+    UserServiceAndPlan userServiceAndPlan = HiveUserDatabase().getServiceAndPlanData();
+    UserSettingModel userSettingModel = HiveUserDatabase().getSettingData();
     final width = MediaQuery.of(context).size.width;
-    double height = 190;
-
-    String userFirstName = Provider.of<UserInformation>(context, listen: false).user.firstName ?? "";
-    String userLastName = Provider.of<UserInformation>(context, listen: false).user.lastName ?? "";
-    String userEmailAddress = Provider.of<UserInformation>(context, listen: false).user.email ?? "";
-    String userPhone = Provider.of<UserInformation>(context, listen: false).user.phone ?? "";
-    String userStatus = Provider.of<UserServiceInformation>(context, listen: false).model.status;
-    List<UserScheduledListModel> scheduledList = Provider.of<UserScheduleList>(context, listen: false).scheduledList ?? [];
-    // UserScheduledListModel(scheduledImage: SImages.user, scheduledTime: "10.00am"),
-    String userImage = Provider.of<UserInformation>(context, listen: false).user.image ?? "";
-    double totalRating = Provider.of<UserRatingInformation>(context, listen: false).user.totalRating;
-    double numberRated = Provider.of<UserRatingInformation>(context, listen: false).user.numberRated;
+    double height = 230;
 
     return SizedBox(
       height: height,
@@ -36,7 +28,7 @@ class _CentreProfileState extends State<CentreProfile> {
           //Background Image for the Profile, Profile Picture, Service Symbol and Status
           Container(
             width: width,
-            height: height - 40,
+            height: height - 80,
             decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage(SImages.centreOne),
@@ -60,10 +52,13 @@ class _CentreProfileState extends State<CentreProfile> {
                           shape: BoxShape.circle,
                           border: Border.fromBorderSide(BorderSide(color: Theme.of(context).primaryColorLight, width: 1.2))
                         ),
-                        child: Avatar.medium(image: userImage,)
+                        child: Avatar.medium(
+                          userInformationModel: userInformationModel,
+                          onClick: () => openPictureDialog(context, userInformationModel),
+                        )
                       ),
                     ),
-    
+
                     //User Status Checker
                     Padding(
                       padding: const EdgeInsets.only(bottom: 5.0),
@@ -74,10 +69,10 @@ class _CentreProfileState extends State<CentreProfile> {
                           borderRadius: BorderRadius.circular(8)
                         ),
                         child: SText(
-                          text: userStatus == "Online" || UserPreferences().getShowAlwaysOnline()
+                          text: userServiceAndPlan.status == "Online" || userSettingModel.alwaysOnline
                           ? "Online" : "Offline",
                           size: 14,
-                          color: userStatus == "Online" || UserPreferences().getShowAlwaysOnline()
+                          color: userServiceAndPlan.status == "Online" || userSettingModel.alwaysOnline
                           ? SColors.green : Theme.of(context).backgroundColor,
                         ),
                       ),
@@ -87,7 +82,7 @@ class _CentreProfileState extends State<CentreProfile> {
               ],
             ),
           ),
-    
+
           //Edit Profile Button
           Positioned(
             top: 130,
@@ -95,6 +90,7 @@ class _CentreProfileState extends State<CentreProfile> {
             child: SButton(
               text: "Edit Profile",
               textSize: 14,
+              borderRadius: 0,
               onClick: () => Get.to(() => const EditProfileScreen()),
               textWeight: FontWeight.bold,
               border: Border.all(width: 2, color: Theme.of(context).primaryColorDark),
@@ -107,19 +103,19 @@ class _CentreProfileState extends State<CentreProfile> {
             top: 160,
             child: //User fullName and email address
               Padding(
-                padding: const EdgeInsets.only(left: 15.0, bottom: 5.0),
+                padding: const EdgeInsets.only(left: 15.0, bottom: 5.0, top: 5.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SText(
-                      text: "$userFirstName $userLastName Evaristus",
+                      text: "${userInformationModel.firstName} ${userInformationModel.lastName}",
                       size: 20,
                       weight: FontWeight.bold,
                       color: Theme.of(context).primaryColor
                     ),
                     const SizedBox(width: 10),
                     SText(
-                      text: userEmailAddress,
+                      text: userInformationModel.emailAddress,
                       size: 14,
                       weight: FontWeight.bold,
                       color: SColors.hint
@@ -128,59 +124,76 @@ class _CentreProfileState extends State<CentreProfile> {
                 ),
               ),
           ),
-          //Rating, Phone number, Country and Country Flag, Scheduled buttons
         ],
       ),
     );
   }
 }
 
+class ScheduledBox extends StatelessWidget{
+  final UserScheduleModel user;
+  const ScheduledBox({ super.key, required this.user});
+
+  @override
+  Widget build(BuildContext context){
+    return Container(
+      padding: const EdgeInsets.only(top: 6.0, bottom: 6.0, right: 6.0),
+      margin: const EdgeInsets.only(right: 4.0),
+      decoration: BoxDecoration(
+        color: SColors.blue,
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Row(
+        children: [
+          UserAvatar.small(image: user.schedulerImage),
+          SText(text: user.scheduledTime, color: SColors.white, size: 14, weight: FontWeight.normal)
+        ]
+      )
+    );
+  }
+}
+
 class CentreOtherProfile extends StatefulWidget {
-  final Country selectedCountry;
-  const CentreOtherProfile({super.key, required this.selectedCountry});
+  const CentreOtherProfile({super.key});
 
   @override
   State<CentreOtherProfile> createState() => _CentreOtherProfileState();
 }
 
 class _CentreOtherProfileState extends State<CentreOtherProfile> {
+  UserInformationModel userInformationModel = HiveUserDatabase().getProfileData();
+  late final Stream<List<UserScheduleModel>> _scheduledListStream;
+  late final Stream<UserInformationModel> _ratingStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _scheduledListStream = supabase.from(Supa().scheduled).stream(primaryKey: ['id']).eq("serchID", userInformationModel.serchID)
+      .order('created_at').map((maps) => maps.map((map) => UserScheduleModel.fromMap(map)).toList());
+
+    _ratingStream = supabase.from(Supa().profile).stream(primaryKey: ['id']).eq("serchAuth", userInformationModel.serchAuth).map(
+      (maps) => maps.map((map) => UserInformationModel.fromMap(map)).toList()
+    ).map((list) => list.first);
+  }
+
   @override
   Widget build(BuildContext context) {
-    double totalRating = Provider.of<UserRatingInformation>(context, listen: false).user.totalRating;
-    String userPhone = Provider.of<UserInformation>(context, listen: false).user.phone ?? "";
-    List<UserScheduledListModel> scheduledList = Provider.of<UserScheduleList>(context, listen: false).scheduledList ?? [
-      UserScheduledListModel(scheduledImage: SImages.user, scheduledTime: "10.00am"),
-      UserScheduledListModel(scheduledImage: SImages.user, scheduledTime: "10.00am"),
-      UserScheduledListModel(scheduledImage: SImages.user, scheduledTime: "10.00am"),
-      UserScheduledListModel(scheduledImage: SImages.user, scheduledTime: "10.00am"),
-      UserScheduledListModel(scheduledImage: SImages.user, scheduledTime: "10.00am"),
-      UserScheduledListModel(scheduledImage: SImages.user, scheduledTime: "10.00am"),
-      UserScheduledListModel(scheduledImage: SImages.user, scheduledTime: "10.00am"),
-    ];
-    double numberRated = Provider.of<UserRatingInformation>(context, listen: false).user.numberRated;
-    // UserScheduledListModel(scheduledImage: SImages.user, scheduledTime: "10.00am"),
-    // String ratings(){
-    //   if(numberRated.toInt() < 2){
-    //     return "No rating yet";
-    //   } else {
-    //     return numberRated.toInt().toString();
-    //   }
-    // }
-
+    Country country = countries.where((element) => element.name == userInformationModel.countryInfo.country).first;
+    List<UserScheduleModel> schedulingList = HiveUserDatabase().getScheduleDataList();
+    final phoneNumber = "${userInformationModel.phoneInfo.phoneCountryCode}${userInformationModel.phoneInfo.phone}";
 
     return Container(
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: SColors.hint, width: 1))
-      ),
+      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: SColors.hint, width: 1))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           //Phone Number and Country Name and Flag
+          const SizedBox(height: 3),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               //User Phonenumber
-              Row(
+              phoneNumber.isNotEmpty ? Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Icon(
@@ -190,15 +203,15 @@ class _CentreOtherProfileState extends State<CentreOtherProfile> {
                   ),
                   const SizedBox(width: 5),
                   SButton(
-                    text: userPhone,
+                    text: phoneNumber,
                     textSize: 16,
-                    onClick: () => makePhoneCall(userPhone),
+                    onClick: () => WebFunctions.makePhoneCall(phoneNumber),
                     textWeight: FontWeight.bold,
                     textColor: Scolors.info,
                     buttonColor: Theme.of(context).scaffoldBackgroundColor
                   ),
                 ],
-              ),
+              ) : Container(),
               const SizedBox(width: 8),
               //Country Name
               Row(
@@ -211,14 +224,14 @@ class _CentreOtherProfileState extends State<CentreOtherProfile> {
                   ),
                   const SizedBox(width: 5),
                   SText(
-                    text: widget.selectedCountry.name,
+                    text: country.name,
                     size: 16,
                     weight: FontWeight.bold,
                     color: SColors.hint
                   ),
                   const SizedBox(width: 5),
                   Image.asset(
-                    flagImage(widget.selectedCountry.code.toLowerCase()),
+                    flagImage(country.code.toLowerCase()),
                     width: 20,
                   ),
                 ],
@@ -226,92 +239,297 @@ class _CentreOtherProfileState extends State<CentreOtherProfile> {
             ],
           ),
           const SizedBox(height: 10),
-          //Scheduled List Buttons
-          if(scheduledList.isEmpty)
-          Container(
-            padding: const EdgeInsets.all(6.0),
-            decoration: BoxDecoration(
-              color: Theme.of(context).backgroundColor,
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: const SText(
-              text: "List of scheduled service trips will appear here.",
-              color: SColors.hint,
-              weight: FontWeight.bold,
-              size: 12
-            )
-          )
-          else
-          SizedBox(
-            height: 33,
-            child: ListView.builder(
-              itemCount: scheduledList.length,
-              physics: const AlwaysScrollableScrollPhysics(),
-              // shrinkWrap: true,
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index) => ScheduledBox(user: scheduledList[index])
-            ),
+          StreamBuilder<List<UserScheduleModel>>(
+            stream: _scheduledListStream,
+            builder: (context, snapshot) {
+              if(snapshot.hasData) {
+                final scheduledList = snapshot.data!;
+                return scheduledList.isEmpty ? Container(
+                  padding: const EdgeInsets.all(6.0),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).backgroundColor,
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: const SText(
+                    text: "List of scheduled service trips will appear here.",
+                    color: SColors.hint,
+                    weight: FontWeight.bold,
+                    size: 12
+                  )
+                ) : SizedBox(
+                  height: 33,
+                  child: ListView.builder(
+                    itemCount: scheduledList.length,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    // shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) => ScheduledBox(user: scheduledList[index])
+                  ),
+                );
+              } else {
+                return schedulingList.isEmpty ? Container(
+                  padding: const EdgeInsets.all(6.0),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).backgroundColor,
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: const SText(
+                    text: "List of scheduled service trips will appear here.",
+                    color: SColors.hint,
+                    weight: FontWeight.bold,
+                    size: 12
+                  )
+                ) : SizedBox(
+                  height: 33,
+                  child: ListView.builder(
+                    itemCount: schedulingList.length,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    // shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) => ScheduledBox(user: schedulingList[index])
+                  ),
+                );
+              }
+            }
           ),
           const SizedBox(height: 10),
           //All about Rating
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Column(
-                children: [
-                  RatingBarIndicator(
-                    rating: 3,
-                    itemBuilder: (context, index) => const Icon(Icons.star, color: Colors.amber),
-                    itemCount: 5,
-                    itemSize: 15.0,
-                  ),
-                  const SText(
-                    text: "Rate Stars",
-                    color: SColors.hint,
-                    weight: FontWeight.bold,
-                    size: 16
-                  )
-                ]
-              ),
-              Column(
-                children: [
-                  SText(
-                    text: totalRating.toString(),
-                    size: 20,
-                    color: Theme.of(context).primaryColor,
-                    weight: FontWeight.bold,
-                  ),
-                  const SText(
-                    text: "Rate Average",
-                    color: SColors.hint,
-                    weight: FontWeight.bold,
-                    size: 16
-                  )
-                ]
-              ),
-              Column(
-                children: [
-                  SText(
-                    text: numberRated.toInt().toString(),
-                    size: 20,
-                    weight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  const SText(
-                    text: "Rate Count",
-                    color: SColors.hint,
-                    weight: FontWeight.bold,
-                    size: 16
-                  )
-                ]
-              )
-            ]
+          StreamBuilder<UserInformationModel>(
+            stream: _ratingStream,
+            builder: (context, snapshot) {
+              if(snapshot.hasData) {
+                final rating = snapshot.data!;
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Column(
+                      children: [
+                        RatingBarIndicator(
+                          rating: double.parse(rating.totalRating),
+                          itemBuilder: (context, index) => const Icon(Icons.star, color: Colors.amber),
+                          itemCount: 5,
+                          itemSize: 15.0,
+                        ),
+                        const SizedBox(height: 2),
+                        const SText(
+                          text: "Rate Stars",
+                          color: SColors.hint,
+                          weight: FontWeight.bold,
+                          size: 16
+                        )
+                      ]
+                    ),
+                    Column(
+                      children: [
+                        SText(
+                          text: rating.totalRating.toString(),
+                          size: 20,
+                          color: Theme.of(context).primaryColor,
+                          weight: FontWeight.bold,
+                        ),
+                        const SText(
+                          text: "Rate Average",
+                          color: SColors.hint,
+                          weight: FontWeight.bold,
+                          size: 16
+                        )
+                      ]
+                    ),
+                    Column(
+                      children: [
+                        SText(
+                          text: rating.numberOfRating.toString(),
+                          size: 20,
+                          weight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        const SText(
+                          text: "Rate Count",
+                          color: SColors.hint,
+                          weight: FontWeight.bold,
+                          size: 16
+                        )
+                      ]
+                    )
+                  ]
+                );
+              } else if(snapshot.connectionState == ConnectionState.waiting) {
+                return const ShimmerSerch(amount: 1);
+              } else {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Column(
+                      children: [
+                        RatingBarIndicator(
+                          rating: double.parse(userInformationModel.totalRating),
+                          itemBuilder: (context, index) => const Icon(Icons.star, color: Colors.amber),
+                          itemCount: 5,
+                          itemSize: 15.0,
+                        ),
+                        const SizedBox(height: 2),
+                        const SText(
+                          text: "Rate Stars",
+                          color: SColors.hint,
+                          weight: FontWeight.bold,
+                          size: 16
+                        )
+                      ]
+                    ),
+                    Column(
+                      children: [
+                        SText(
+                          text: userInformationModel.totalRating.toString(),
+                          size: 20,
+                          color: Theme.of(context).primaryColor,
+                          weight: FontWeight.bold,
+                        ),
+                        const SText(
+                          text: "Rate Average",
+                          color: SColors.hint,
+                          weight: FontWeight.bold,
+                          size: 16
+                        )
+                      ]
+                    ),
+                    Column(
+                      children: [
+                        SText(
+                          text: userInformationModel.numberOfRating.toString(),
+                          size: 20,
+                          weight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        const SText(
+                          text: "Rate Count",
+                          color: SColors.hint,
+                          weight: FontWeight.bold,
+                          size: 16
+                        )
+                      ]
+                    )
+                  ]
+                );
+              }
+            }
           ),
           const SizedBox(height: 10,),
         ],
       ),
     );
   }
+}
+
+void openPictureDialog(BuildContext context, UserInformationModel userInformationModel) {
+  showModalBottomSheet(
+    context: context,
+    enableDrag: false,
+    backgroundColor: Colors.transparent,
+    builder: (context) => StatefulBuilder(
+      builder: (context, setState) {
+        final imagePath = userInformationModel.avatar;
+        final userImage = imagePath.contains("https://") ? NetworkImage(imagePath)
+        : imagePath.startsWith("/") ? FileImage(File(imagePath)) : AssetImage(
+          userInformationModel.service == "Electrician" ? SImages.manElectrician
+          : userInformationModel.gender == "Female" && userInformationModel.service == "Electrician" ? SImages.womanElectrician
+          : userInformationModel.service == "Plumber" ? SImages.manPlumber
+          : userInformationModel.gender == "Female" && userInformationModel.service == "Plumber" ? SImages.manPlumber
+          : userInformationModel.service == "Mechanic" ? SImages.manMechanic
+          : userInformationModel.gender == "Female" && userInformationModel.service == "Mechanic" ? SImages.manMechanic
+          : userInformationModel.gender == "Prefer Not to Say" && userInformationModel.service == "" ? SImages.noGender
+          : userInformationModel.gender == "Female" && userInformationModel.service == "" ? SImages.woman
+          : SImages.man
+        );
+        return SizedBox(
+          child: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: userInformationModel.avatar.isEmpty ? SColors.darkTheme : null
+                  ),
+                  child: Stack(
+                    children: [
+                      Container(
+                        height: 500,
+                        width: Get.width,
+                        decoration: BoxDecoration(
+                          borderRadius: userInformationModel.avatar.isEmpty ? BorderRadius.circular(0) : BorderRadius.circular(12),
+                          color: userInformationModel.avatar.isEmpty ? SColors.darkTheme : null
+                        ),
+                        child: Image(
+                          image: userImage as ImageProvider,
+                          fit: BoxFit.cover, filterQuality: FilterQuality.high,
+                        )
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.wrap_text_outlined, color: SColors.white, size: 22,),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: SText(
+                                    text: "${userInformationModel.firstName} ${userInformationModel.lastName}",
+                                    color: SColors.white,
+                                    size: 22,
+                                    weight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                //Add verified symbol
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.work_history_outlined, color: SColors.white, size: 18,),
+                                const SizedBox(width: 8),
+                                SText(
+                                  text: userInformationModel.service,
+                                  color: SColors.white,
+                                  size: 18,
+                                  weight: FontWeight.bold,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              SButton(
+                text: "Edit Profile",
+                textSize: 14,
+                borderRadius: 16,
+                onClick: () => Get.to(() => const EditProfileScreen()),
+                textWeight: FontWeight.bold,
+                width: Get.width - 25,
+                padding: const EdgeInsets.all(16),
+                textColor: SColors.white,
+                buttonColor: SColors.lightPurple
+              ),
+              const SizedBox(height: 10),
+            ]
+          )
+        );
+      }
+    )
+  );
 }

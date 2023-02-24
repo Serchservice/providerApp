@@ -98,6 +98,13 @@ class _SettingScreenState extends State<SettingScreen> {
                   ),
                   const SizedBox(height: 10),
                   SetTab(
+                    settingDetail: "For a better experience, select a language".tr,
+                    prefixIcon: Icons.language_rounded,
+                    settingHeader: "Language: ${getLanguageName(context)}".tr,
+                    onPressed: () => showSerchLocaleModalBottomSheet(context)
+                  ),
+                  const SizedBox(height: 10),
+                  SetTab(
                     settingHeader: "App Info",
                     prefixIcon: Icons.info,
                     onPressed: () => Get.to(() => const AppInfoScreen())

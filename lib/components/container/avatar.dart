@@ -2,125 +2,117 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provide/lib.dart';
-import 'package:provider/provider.dart';
 
-class AvatarPicture extends StatelessWidget {
-  final double radius;
-  const AvatarPicture({super.key, required this.radius});
+// class SSPicture extends StatelessWidget {
+//   final double radius;
+//   const SSPicture({super.key, required this.radius});
 
-  const AvatarPicture.small({super.key}) : radius = 16;
-  const AvatarPicture.medium({super.key}) : radius = 22;
-  const AvatarPicture.large({super.key}) : radius = 40;
+//   const SSPicture.small({super.key}) : radius = 12;
+//   const SSPicture.medium({super.key}) : radius = 22;
+//   const SSPicture.large({super.key}) : radius = 30;
+//   @override
+//   Widget build(BuildContext context) {
+//     String service = Provider.of<UserServiceInformation>(context, listen: false).model.service ?? "";
+//     String firstName = "Provider.of<UserInformation>(context, listen: false).user.firstName ?? """;
+//     String lastName = "Provider.of<UserInformation>(context, listen: false).user.lastName ?? """;
+//     String initials() {
+//       if(firstName.isEmpty || lastName.isEmpty){
+//         return "Eva";
+//       } else {
+//         return "${firstName.substring(0, 1)}${lastName.substring(0, 1)}";
+//       }
+//     }
 
-  @override
-  Widget build(BuildContext context) {
-    String gender = Provider.of<UserInformation>(context, listen: false).user.gender ?? "";
-    String service = Provider.of<UserServiceInformation>(context, listen: false).model.service ?? "";
-    return CircleAvatar(
-      radius: radius,
-      backgroundColor: SColors.lightPurple,
-      foregroundImage: gender == "Male" && service == "Electrician"
-      ? const AssetImage(SImages.manElectrician)
+//     return CircleAvatar(
+//       radius: radius,
+//       backgroundColor: SColors.lightPurple,
+//       child: service == "Electrician"
+//       ? Image.asset(SImages.electric, width: radius, height: radius)
 
-      : gender == "Female" && service == "Electrician"
-      ? const AssetImage(SImages.womanElectrician)
+//       : service == "Plumber"
+//       ? Image.asset(SImages.plumb, width: radius, height: radius)
 
-      : gender == "Male" && service == "Plumber"
-      ? const AssetImage(SImages.manPlumber)
+//       : service == "Mechanic"
+//       ? Image.asset(SImages.mech, width: radius, height: radius)
 
-      : gender == "Female" && service == "Plumber"
-      ? const AssetImage(SImages.manPlumber)
+//       : service == "Barber"
+//       ? Image.asset(SImages.barb, width: radius, height: radius)
 
-      : gender == "Male" && service == "Mechanic"
-      ? const AssetImage(SImages.manMechanic)
-
-      : gender == "Female" && service == "Mechanic"
-      ? const AssetImage(SImages.manMechanic)
-
-      : gender == "Prefer Not to Say" && service == ""
-      ? const AssetImage(SImages.noGender)
-
-      : gender == "Male" && service == "Barber"
-      ? const AssetImage(SImages.barberAvatar)
-
-      : gender == "Female" && service == "Barber"
-      ? const AssetImage(SImages.barberAvatar)
-
-      : gender == "Prefer Not to say" && service == "Barber"
-      ? const AssetImage(SImages.barberAvatar)
-
-      : gender == "Male" && service == ""
-      ? const AssetImage(SImages.man)
-
-      : gender == "Female" && service == ""
-      ? const AssetImage(SImages.woman)
-
-      : const AssetImage(SImages.logo)
-    );
-  }
-}
-
-class SSPicture extends StatelessWidget {
-  final double radius;
-  const SSPicture({super.key, required this.radius});
-
-  const SSPicture.small({super.key}) : radius = 12;
-  const SSPicture.medium({super.key}) : radius = 22;
-  const SSPicture.large({super.key}) : radius = 30;
-  @override
-  Widget build(BuildContext context) {
-    String service = Provider.of<UserServiceInformation>(context, listen: false).model.service ?? "";
-    String firstName = Provider.of<UserInformation>(context, listen: false).user.firstName ?? "";
-    String lastName = Provider.of<UserInformation>(context, listen: false).user.lastName ?? "";
-    String initials() {
-      if(firstName.isEmpty || lastName.isEmpty){
-        return "Eva";
-      } else {
-        return "${firstName.substring(0, 1)}${lastName.substring(0, 1)}";
-      }
-    }
-
-    return CircleAvatar(
-      radius: radius,
-      backgroundColor: SColors.lightPurple,
-      child: service == "Electrician"
-      ? Image.asset(SImages.electric, width: radius, height: radius)
-
-      : service == "Plumber"
-      ? Image.asset(SImages.plumb, width: radius, height: radius)
-
-      : service == "Mechanic"
-      ? Image.asset(SImages.mech, width: radius, height: radius)
-
-      : service == "Barber"
-      ? Image.asset(SImages.barb, width: radius, height: radius)
-
-      : Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SText(
-          text: initials(),
-          size: radius - 5,
-          weight: FontWeight.bold
-        ),
-      )
-    );
-  }
-}
+//       : Padding(
+//         padding: const EdgeInsets.all(8.0),
+//         child: SText(
+//           text: initials(),
+//           size: radius - 5,
+//           weight: FontWeight.bold
+//         ),
+//       )
+//     );
+//   }
+// }
 
 class Avatar extends StatelessWidget {
-  final String? image;
+  final UserInformationModel userInformationModel;
   final double radius;
-  const Avatar({super.key, this.image, required this.radius});
-  const Avatar.large({super.key, this.image}) : radius = 50;
-  const Avatar.medium({super.key, this.image}) : radius = 30;
-  const Avatar.small({super.key, this.image}) : radius = 20;
+  final VoidCallback? onClick;
+  const Avatar({
+    super.key, required this.radius, this.userInformationModel = const UserInformationModel(), this.onClick
+  });
+  const Avatar.large({
+    super.key, this.userInformationModel = const UserInformationModel(), this.onClick
+  }) : radius = 50;
+  const Avatar.medium({
+    super.key, this.userInformationModel = const UserInformationModel(), this.onClick
+  }) : radius = 30;
+  const Avatar.small({
+    super.key, this.userInformationModel = const UserInformationModel(), this.onClick
+  }) : radius = 20;
 
   @override
   Widget build(BuildContext context) {
-    if(image == null || image!.isEmpty) {
-      return AvatarPicture(radius: radius);
+    final imagePath = userInformationModel.avatar;
+    final userImage = imagePath.contains("https://") ? NetworkImage(imagePath)
+    : imagePath.startsWith("/") ? FileImage(File(imagePath)) : AssetImage(
+      userInformationModel.service == "Electrician" ? SImages.manElectrician
+      : userInformationModel.gender == "Female" && userInformationModel.service == "Electrician" ? SImages.womanElectrician
+      : userInformationModel.service == "Plumber" ? SImages.manPlumber
+      : userInformationModel.gender == "Female" && userInformationModel.service == "Plumber" ? SImages.manPlumber
+      : userInformationModel.service == "Mechanic" ? SImages.manMechanic
+      : userInformationModel.gender == "Female" && userInformationModel.service == "Mechanic" ? SImages.manMechanic
+      : userInformationModel.gender == "Prefer Not to Say" && userInformationModel.service == "" ? SImages.noGender
+      : userInformationModel.gender == "Female" && userInformationModel.service == "" ? SImages.woman
+      : SImages.man
+    );
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onClick,
+        child: CircleAvatar(
+          radius: radius,
+          backgroundColor: SColors.lightPurple,
+          foregroundImage: userImage as ImageProvider
+        ),
+      ),
+    );
+  }
+}
+
+class UserAvatar extends StatelessWidget {
+  final String image;
+  final double radius;
+  const UserAvatar({super.key, this.image = "", required this.radius});
+  const UserAvatar.large({super.key, this.image = ""}) : radius = 50;
+  const UserAvatar.medium({super.key, this.image = ""}) : radius = 30;
+  const UserAvatar.small({super.key, this.image = ""}) : radius = 20;
+
+  @override
+  Widget build(BuildContext context) {
+    if(image.isEmpty) {
+      return CircleAvatar(
+        radius: radius,
+        foregroundImage: const AssetImage(SImages.noGender)
+      );
     } else {
-      final imagePath = image!;
+      final imagePath = image;
       final userImage = imagePath.contains("https://") ? NetworkImage(imagePath)
       : imagePath.startsWith("/") ? FileImage(File(imagePath)) : AssetImage(imagePath);
       return CircleAvatar(

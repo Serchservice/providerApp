@@ -1,10 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:provider/provider.dart';
 import 'package:provide/lib.dart';
-
-//Add Age selector
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignupForm extends StatefulWidget {
   const SignupForm({super.key});
@@ -20,29 +18,68 @@ class _SignupFormState extends State<SignupForm> {
   final email = TextEditingController();
   final firstName = TextEditingController();
   final lastName = TextEditingController();
-  String? myGender;
-  String? phone, phoneNumber, phoneCountryCode, phoneCountryISOCode;
-  String? country, countryCode, countryDialCode, countryFlag;
-
-  bool showP = true, showC = true;
+  String? myGender, country, countryDialCode;
+  String? phone, phoneCountryCode, phoneCountryISOCode;
+  bool showP = true, showC = true, loading = false;
 
   Future signup() async {
-    // if(!_formKey.currentState!.validate()) return;
+    if(!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
-    Provider.of<UserInformation>(context, listen: false).updateUserInformation(
-      newEmail: email.text.trim(), newFirstName: firstName.text.trim(), newLastName: lastName.text.trim(), newPhone: phone.toString(),
-      newPhoneNumber: phoneNumber.toString(), newPassword: password.text.trim(), newEmailAddress: email.text.trim(),
-      newCountry: country.toString(), newCountryDialCode: countryDialCode.toString(), newGender: myGender.toString(),
-      newPhoneCountryCode: phoneCountryCode.toString(), newPhoneCountryISOCode: phoneCountryISOCode.toString(),
-    );
-    Get.offAll(() => const ChooseServiceScreen());
-    // final authProvide = Provider.of<Auth>(context, listen: false);
-    // authProvide.signUp(
-    //   password: password.text.trim(), email: email.text.trim(), firstName: firstName.text.trim(),
-    //   lastName: lastName.text.trim(), phoneNumber: phoneNumber.toString(), gender: myGender.toString(), country: country.toString(),
-    //   countryCode: countryCode.toString(), countryDialCode: countryDialCode.toString(), countryFlag: countryFlag.toString(),
-    //   phone: phone.toString(), phoneCountryCode: phoneCountryCode.toString(), phoneCountryISOCode: phoneCountryISOCode.toString()
-    // );
+    setState(() => loading = true);
+    var country = countries.firstWhere((element) => element.code == phoneCountryISOCode.toString());
+    try {
+      final user = await supabase.auth.signUp(
+        email: email.text.trim(),
+        password: password.text.trim(),
+        data: {
+          "firstName": firstName.text.trim(),
+          "lastName": lastName.text.trim(),
+          "phone": phone.toString()
+        }
+      );
+
+      final model = UserInformationModel(
+        emailAddress: email.text.trim(), firstName: firstName.text.trim(), lastName: lastName.text.trim(),
+        password: password.text.trim(), referLink: CodeGenerator.generateReferLink(), gender: myGender.toString(),
+        phoneInfo: UserPhoneInfo(phone: phone.toString(), phoneCountryCode: phoneCountryCode.toString(),
+        phoneCountryISOCode: phoneCountryISOCode.toString()), countryInfo: UserCountryInfo(
+          country: country.name,countryDialCode: country.dialCode), serchAuth: user.user!.id,
+        serchID: CodeGenerator.generateSerchID(), avatar: "", totalServiceTrips: 0
+      );
+      final setting = UserSettingModel(serchID: model.serchID);
+
+      try {
+        await supabase.from(Supa().profile).insert(model.toJson());
+        await supabase.from(Supa().setting).insert(setting.toJson());
+        HiveUserDatabase().saveProfileData(model);
+        HiveUserDatabase().saveSettingData(setting);
+        Get.offAll(() => const ConfirmEmailScreen());
+      } on PostgrestException catch (e) {
+        if(e.message.contains("email")){
+          showGetSnackbar(
+            message: "Email Address already exists",
+            type: Popup.error,
+            duration: const Duration(seconds: 3)
+          );
+          setState(() => loading = false);
+        } else {
+          showGetSnackbar(
+            message: e.message,
+            type: Popup.error,
+            duration: const Duration(seconds: 3)
+          );
+          setState(() => loading = false);
+        }
+      }
+      setState(() => loading = false);
+    } on AuthException catch (e) {
+      showGetSnackbar(
+        message: e.message,
+        type: Popup.error,
+        duration: const Duration(seconds: 3)
+      );
+      setState(() => loading = false);
+    }
   }
 
   @override
@@ -107,16 +144,13 @@ class _SignupFormState extends State<SignupForm> {
               formName: "Phone Number *",
               formStyle: STexts.authForm(context),
               onPhoneChanged: (value) {
-                setState(() => phoneNumber = value.completeNumber);
                 setState(() => phoneCountryISOCode = value.countryISOCode);
                 setState(() => phoneCountryCode = value.countryCode.toString());
                 setState(() => phone = value.number);
               },
               onCountryChanged: (value) {
                 setState(() => country = value.name);
-                setState(() => countryCode = value.code);
                 setState(() => countryDialCode = value.dialCode);
-                setState(() => countryFlag = value.flag);
               },
               enabledBorderColor: Theme.of(context).backgroundColor,
             ),
@@ -163,16 +197,14 @@ class _SignupFormState extends State<SignupForm> {
               suffixColor: Theme.of(context).primaryColorLight,
             ),
             const SizedBox(height: 40),
-            Consumer<Auth>(
-              builder: (context, authProvide, _) => SButton(
-                text: "Sign me up",
-                width: width,
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                textWeight: FontWeight.bold,
-                textSize: 18,
-                loading: authProvide.isLoading,
-                onClick: () => signup(),
-              ),
+            SButton(
+              text: "Sign me up",
+              width: width,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              textWeight: FontWeight.bold,
+              textSize: 18,
+              loading: loading,
+              onClick: () => signup(),
             ),
             const SizedBox(height: 40),
             SButtonText(

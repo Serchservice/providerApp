@@ -1,5 +1,5 @@
 export 'common.dart';
-export 'database/connection.dart';
+export 'database.dart';
 
 class SharedKeys{
   final theme = "themePermission";
@@ -11,4 +11,5 @@ class SharedBoxes{
   final preferences = "preferences";
   final permissions = "permissions";
   final connection = "connection";
+  final database = "database";
 }

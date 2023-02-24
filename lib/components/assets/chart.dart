@@ -1,251 +1,214 @@
-import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
 
-class SLineChart extends StatelessWidget {
-  const SLineChart({super.key, required this.isShowingMainData});
+// return LineChartData(
+//   lineTouchData: lineTouchData1,
+//   gridData: gridData,
+//   titlesData: titlesData1,
+//   borderData: borderData,
+//   lineBarsData: [
+//     LineChartBarData(
+//       spots: [
+//         FlSpot(0, data['rating1']),
+//         FlSpot(1, data['rating2']),
+//         ...
+//       ],
+//       isCurved: true,
+//       colors: [
+//         Colors.red,
+//       ],
+//       barWidth: 4,
+//       isStrokeCapRound: true,
+//       dotData: FlDotData(
+//         show: false,
+//       ),
+//       belowBarData: BarAreaData(
+//         show: false,
+//       ),
+//     ),
+//   ],
+//   minX: 0,
+//   maxX: data['numRatings'].toDouble(),
+//   maxY: data['maxRating'].toDouble(),
+//   minY: data['minRating'].toDouble(),
+// );
 
-  final bool isShowingMainData;
+// class SLineChart extends StatefulWidget {
+//   @override
+//   _SLineChartState createState() => _SLineChartState();
+// }
 
-  @override
-  Widget build(BuildContext context) {
-    return LineChart(
-      isShowingMainData ? sampleData1 : sampleData2,
-      swapAnimationDuration: const Duration(milliseconds: 250),
-    );
-  }
+// class _SLineChartState extends State<SLineChart> {
+//   List<double> userRatings;
+//   int numberOfRatings;
 
-  LineChartData get sampleData1 => LineChartData(
-    lineTouchData: lineTouchData1,
-    gridData: gridData,
-    titlesData: titlesData1,
-    borderData: borderData,
-    lineBarsData: lineBarsData1,
-    minX: 0,
-    maxX: 14,
-    maxY: 4,
-    minY: 0,
-  );
+//   @override
+//   void initState() {
+//     super.initState();
+//     // Call your function to fetch the user's data from your Supabase table here
+//     // and store the results in the userRatings and numberOfRatings variables
+//     fetchUserData().then((result) {
+//       setState(() {
+//         userRatings = result['userRatings'];
+//         numberOfRatings = result['numberOfRatings'];
+//       });
+// /LineChartData get userData => LineChartData(
+//   lineTouchData: lineTouchData1,
+//   gridData: gridData,
+//   titlesData: titlesData1,
+//   borderData: borderData,
+//   lineBarsData: userLineBarsData,
+//   minX: minX,
+//   maxX: maxX,
+//   maxY: maxY,
+//   minY: minY,
+// );
 
-  LineChartData get sampleData2 => LineChartData(
-    lineTouchData: lineTouchData2,
-    gridData: gridData,
-    titlesData: titlesData2,
-    borderData: borderData,
-    lineBarsData: lineBarsData2,
-    minX: 0,
-    maxX: 14,
-    maxY: 6,
-    minY: 0,
-  );
+// List<LineChartBarData> get userLineBarsData {
+//   List<LineChartBarData> barData = [];
+//   // Loop through the data from your database and create LineChartBarData objects
+//   for (int i = 0; i < dataFromDatabase.length; i++) {
+//     barData.add(LineChartBarData(
+//       spots: dataFromDatabase[i].spots,
+//       isCurved: dataFromDatabase[i].isCurved,
+//       colors: dataFromDatabase[i].colors,
+//       barWidth: dataFromDatabase[i].barWidth,
+//       isStrokeCapRound: dataFromDatabase[i].isStrokeCapRound,
+//       dotData: dataFromDatabase[i].dotData,
+//       belowBarData: dataFromDatabase[i].belowBarData,
+//     ));
+//   }
+//   return barData;
+// }
 
-  LineTouchData get lineTouchData1 => LineTouchData(
-    handleBuiltInTouches: true,
-    touchTooltipData: LineTouchTooltipData(
-      tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
-    ),
-  );
+// double get minX {
+//   // Calculate the minimum value for the X axis based on the data from your database
+//   return ...;
+// }
 
-  FlTitlesData get titlesData1 => FlTitlesData(
-    bottomTitles: AxisTitles(sideTitles: bottomTitles),
-    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-    leftTitles: AxisTitles(sideTitles: leftTitles()),
-  );
+// double get maxX {
+//   // Calculate the maximum value for the X axis based on the data from your database
+//   return ...;
+// }
 
-  List<LineChartBarData> get lineBarsData1 => [
-    lineChartBarData1_1,
-    lineChartBarData1_2,
-    lineChartBarData1_3,
-  ];
+// double get maxY {
+//   // Calculate the maximum value for the Y axis based on the data from your database
+//   return ...;
+// }
 
-  LineTouchData get lineTouchData2 => LineTouchData(enabled: false);
+// double get minY {
+//   // Calculate the minimum value for the Y axis based on the data from your database
+//   return ...;
+// }
 
-  FlTitlesData get titlesData2 => FlTitlesData(
-    bottomTitles: AxisTitles(sideTitles: bottomTitles),
-    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-    leftTitles: AxisTitles(sideTitles: leftTitles()),
-  );
+// class UserLineChart extends StatelessWidget {
+//   final List<double> userRatings;
+//   final int numRatings;
 
-  List<LineChartBarData> get lineBarsData2 => [
-    lineChartBarData2_1,
-    lineChartBarData2_2,
-    lineChartBarData2_3,
-  ];
+//   UserLineChart({@required this.userRatings, @required this.numRatings});
 
-  Widget leftTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      color: Color(0xff75729e),
-      fontWeight: FontWeight.bold,
-      fontSize: 14,
-    );
-    String text;
-    switch (value.toInt()) {
-      case 1: text = '1m'; break;
-      case 2: text = '2m'; break;
-      case 3: text = '3m'; break;
-      case 4: text = '5m'; break;
-      case 5: text = '6m'; break;
-      default: return Container();
-    }
+//   @override
+//   Widget build(BuildContext context) {
+//     return LineChart(
+//       getLineChartData(),
+//       swapAnimationDuration: const Duration(milliseconds: 250),
+//     );
+//   }
 
-    return Text(text, style: style, textAlign: TextAlign.center);
-  }
+//   LineChartData getLineChartData() {
+//     return LineChartData(
+//       lineTouchData: LineTouchData(handleBuiltInTouches: true),
+//       gridData: GridData(
+//         show: true,
+//         horizontalInterval: 1,
+//         verticalInterval: 1,
+//       ),
+//       titlesData: FlTitlesData(
+//         bottomTitles: AxisTitles(sideTitles: bottomTitles()),
+//         leftTitles: AxisTitles(sideTitles: leftTitles()),
+//       ),
+//       lineBarsData: [
+//         LineChartBarData(
+//           spots: getSpots(),
+//           isCurved: true,
+//           colors: [Colors.blue],
+//           barWidth: 4,
+//         ),
+//       ],
+//       minX: 0,
+//       maxX: userRatings.length - 1,
+//       minY: 0,
+//       maxY: 5,
+//     );
+//   }
 
-  SideTitles leftTitles() => SideTitles(
-    getTitlesWidget: leftTitleWidgets,
-    showTitles: true,
-    interval: 1,
-    reservedSize: 40,
-  );
+//   List<FlSpot> getSpots() {
+//     final spots = <FlSpot>[];
+//     for (int i = 0; i < userRatings.length; i++) {
+//       spots.add(FlSpot(i.toDouble(), userRatings[i]));
+//     }
+//     return spots;
+//   }
 
-  Widget bottomTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      color: Color(0xff72719b),
-      fontWeight: FontWeight.bold,
-      fontSize: 16,
-    );
-    Widget text;
-    switch (value.toInt()) {
-      case 2: text = const Text('SEPT', style: style); break;
-      case 7: text = const Text('OCT', style: style); break;
-      case 12: text = const Text('DEC', style: style); break;
-      default: text = const Text(''); break;
-    }
+//   SideTitles bottomTitles() {
+//     return SideTitles(
+//       showTitles: true,
+//       reservedSize: 22,
+//       textStyle: const TextStyle(
+//         color: Colors.black,
+//         fontWeight: FontWeight.bold,
+//         fontSize: 14,
+//       ),
+//       getTitles: (value) {
+//         final index = value.toInt();
+//         if (index % 2 == 0) {
+//           return 'Month ${index + 1}';
+//         } else {
+//           return '';
+//         }
+//       },
+//     );
+//   }
 
-    return SideTitleWidget(
-      axisSide: meta.axisSide,
-      space: 10,
-      child: text,
-    );
-  }
+//   SideTitles leftTitles() {
+//     return SideTitles(
+//       showTitles: true,
+//       reservedSize: 28,
+//       textStyle: const TextStyle(
+//         color: Colors.black,
+//         fontWeight: FontWeight.bold,
+//         fontSize: 14,
+//       ),
+//       getTitles: (value) {
+//         return '${value.toInt()}';
+//       },
+//     );
+//   }
+// }
 
-  SideTitles get bottomTitles => SideTitles(
-    showTitles: true,
-    reservedSize: 32,
-    interval: 1,
-    getTitlesWidget: bottomTitleWidgets,
-  );
 
-  FlGridData get gridData => FlGridData(show: false);
+// List<FlSpot> getSpots(List<UserRatingsModel> userRatingsModel) {
+//   final groupedRatings = groupBy(userRatingsModel, (rating) => rating.day);
+//   final spots = <FlSpot>[];
 
-  FlBorderData get borderData => FlBorderData(
-    show: true,
-    border: const Border(
-      bottom: BorderSide(color: Color(0xff4e4965), width: 4),
-      left: BorderSide(color: Colors.transparent),
-      right: BorderSide(color: Colors.transparent),
-      top: BorderSide(color: Colors.transparent),
-    ),
-  );
+//   groupedRatings.forEach((day, ratings) {
+//     final totalRatings = ratings.length;
+//     final totalRate = ratings.fold(0, (sum, rating) => sum + rating.rate);
+//     final averageRate = totalRate / totalRatings;
+//     spots.add(FlSpot(day.toDouble(), averageRate));
+//   });
 
-  LineChartBarData get lineChartBarData1_1 => LineChartBarData(
-    isCurved: true,
-    color: const Color(0xff4af699),
-    barWidth: 8,
-    isStrokeCapRound: true,
-    dotData: FlDotData(show: false),
-    belowBarData: BarAreaData(show: false),
-    spots: const [
-      FlSpot(1, 1),
-      FlSpot(3, 1.5),
-      FlSpot(5, 1.4),
-      FlSpot(7, 3.4),
-      FlSpot(10, 2),
-      FlSpot(12, 2.2),
-      FlSpot(13, 1.8),
-    ],
-  );
+//   return spots;
+// }
 
-  LineChartBarData get lineChartBarData1_2 => LineChartBarData(
-    isCurved: true,
-    color: const Color(0xffaa4cfc),
-    barWidth: 8,
-    isStrokeCapRound: true,
-    dotData: FlDotData(show: false),
-    belowBarData: BarAreaData(
-      show: false,
-      color: const Color(0x00aa4cfc),
-    ),
-    spots: const [
-      FlSpot(1, 1),
-      FlSpot(3, 2.8),
-      FlSpot(7, 1.2),
-      FlSpot(10, 2.8),
-      FlSpot(12, 2.6),
-      FlSpot(13, 3.9),
-    ],
-  );
 
-  LineChartBarData get lineChartBarData1_3 => LineChartBarData(
-    isCurved: true,
-    color: const Color(0xff27b6fc),
-    barWidth: 8,
-    isStrokeCapRound: true,
-    dotData: FlDotData(show: false),
-    belowBarData: BarAreaData(show: false),
-    spots: const [
-      FlSpot(1, 2.8),
-      FlSpot(3, 1.9),
-      FlSpot(6, 3),
-      FlSpot(10, 1.3),
-      FlSpot(13, 2.5),
-    ],
-  );
+// List<UserRatingsModel> userRatingsModel = HiveUserDatabase().getRatingsDataList();
 
-  LineChartBarData get lineChartBarData2_1 => LineChartBarData(
-    isCurved: true,
-    curveSmoothness: 0,
-    color: const Color(0x444af699),
-    barWidth: 4,
-    isStrokeCapRound: true,
-    dotData: FlDotData(show: false),
-    belowBarData: BarAreaData(show: false),
-    spots: const [
-      FlSpot(1, 1),
-      FlSpot(3, 4),
-      FlSpot(5, 1.8),
-      FlSpot(7, 5),
-      FlSpot(10, 2),
-      FlSpot(12, 2.2),
-      FlSpot(13, 1.8),
-    ],
-  );
-
-  LineChartBarData get lineChartBarData2_2 => LineChartBarData(
-    isCurved: true,
-    color: const Color(0x99aa4cfc),
-    barWidth: 4,
-    isStrokeCapRound: true,
-    dotData: FlDotData(show: false),
-    belowBarData: BarAreaData(
-      show: true,
-      color: const Color(0x33aa4cfc),
-    ),
-    spots: const [
-      FlSpot(1, 1),
-      FlSpot(3, 2.8),
-      FlSpot(7, 1.2),
-      FlSpot(10, 2.8),
-      FlSpot(12, 2.6),
-      FlSpot(13, 3.9),
-    ],
-  );
-
-  LineChartBarData get lineChartBarData2_3 => LineChartBarData(
-    isCurved: true,
-    curveSmoothness: 0,
-    color: const Color(0x4427b6fc),
-    barWidth: 2,
-    isStrokeCapRound: true,
-    dotData: FlDotData(show: true),
-    belowBarData: BarAreaData(show: false),
-    spots: const [
-      FlSpot(1, 3.8),
-      FlSpot(3, 1.9),
-      FlSpot(6, 5),
-      FlSpot(10, 3.3),
-      FlSpot(13, 4.5),
-    ],
-  );
-}
+// List<FlSpot> getSpots() {
+//   final spots = <FlSpot>[];
+//   for (int i = 0; i < userRatingsModel.length; i++) {
+//     double sum = userRatingsModel.where((rating) => rating.day == i + 1).map((rating) => rating.rate).reduce((a, b) => a + b);
+//     int count = userRatingsModel.where((rating) => rating.day == i + 1).length;
+//     double average = count == 0 ? 0 : sum / count;
+//     spots.add(FlSpot(i.toDouble(), average));
+//   }
+//   return spots;
+// }

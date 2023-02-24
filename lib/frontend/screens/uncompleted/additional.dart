@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provide/lib.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UAdditionalScreen extends StatefulWidget {
   const UAdditionalScreen({super.key});
@@ -59,8 +60,8 @@ class UAdditionalForm extends StatefulWidget {
 }
 
 class _UAdditionalFormState extends State<UAdditionalForm> {
+  UserInformationModel userInformationModel = HiveUserDatabase().getProfileData();
   final _formKey = GlobalKey<FormState>();
-  // final user = FbAuth().currentUser;
   String? titled, relation;
 
   TextEditingController streetNumber = TextEditingController();
@@ -89,22 +90,34 @@ class _UAdditionalFormState extends State<UAdditionalForm> {
       barrierDismissible: false,
       builder:(context) => SLoader.fallingDot(color: Theme.of(context).scaffoldBackgroundColor, size: 70),
     );
-    await AuthIDB().addform(
-      streetNumber: streetNumber.text.trim(), streetName: streetName.text.trim(), lga: lga.text.trim(),
-      landMark: landMark.text.trim(), userCity: userCity.text.trim(), stateOfOrigin: stateOfOrigin.text.trim(),
-      country: country.text.trim(), emailAlternate: emailAlternate.text.trim(), alternatePhoneNumber: alternatePhoneNumber.text.trim(),
-      nokTitle: titled.toString(), nokRelationship: relation.toString(), nokFirstName: nokFirstName.text.trim(),
-      nokLastName: nokLastName.text.trim(), nokEmailAddress: nokEmailAddress.text.trim(), nokPhoneNumber: nokPhoneNumber.text.trim(),
-      nokAddress: nokAddress.text.trim(), nokCity: nokCity.text.trim(), nokState: nokState.text.trim(), nokCountry: nokCountry.text.trim(),
-    );
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder:(context) => SLoader.fallingDot(color: Theme.of(context).scaffoldBackgroundColor, size: 70),
+      );
+      final model = UserAdditionalModel(
+        stNo: int.parse(streetNumber.text.trim()), stName: streetName.text.trim(), lga: lga.text.trim(), landMark: landMark.text.trim(),
+        city: userCity.text.trim(), state: stateOfOrigin.text.trim(), country: country.text.trim(), nokTitle: titled.toString(),
+        emailAlternate: emailAlternate.text.trim(), phoneAlternate: alternatePhoneNumber.text.trim(), nokRelationship: relation.toString(),
+        nokFirstName: nokFirstName.text.trim(), nokLastName: nokLastName.text.trim(), nokEmail: nokEmailAddress.text.trim(),
+        nokPhone: nokPhoneNumber.text.trim(), nokAddress: nokAddress.text.trim(), nokCity: nokCity.text.trim(),
+        nokState: nokState.text.trim(), nokCountry: nokCountry.text.trim(), serchID: userInformationModel.serchID
+      );
+      await supabase.from(Supa().additionalInfo).upsert(model.toJson()).eq("serchID", userInformationModel.serchID);
+      HiveUserDatabase().saveAdditionalData(model);
+      Navigator.pop(context);
+      Get.offAll(() => const PlanScreen());
+    } on PostgrestException catch (e) {
+      showGetSnackbar(
+        message: e.message,
+        type: Popup.error,
+        duration: const Duration(seconds: 3)
+      );
+      Navigator.pop(context);
+    }
     Navigator.pop(context);
     Get.offAll(() => const BottomNavigator());
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    SerchUser.getCurrentUserInfo();
   }
 
   @override
@@ -117,7 +130,7 @@ class _UAdditionalFormState extends State<UAdditionalForm> {
         children: [
           const SizedBox(height: 10),
           SText(
-            text: "Hey ${currentUserInfo?.firstName},",
+            text: "Hey ${userInformationModel.firstName}",
             color: Theme.of(context).scaffoldBackgroundColor,
             size: 22,
             weight: FontWeight.bold,
@@ -269,7 +282,7 @@ class _UAdditionalFormState extends State<UAdditionalForm> {
                     ),
                     const SizedBox(height: 10,),
                     SFormField(
-                      labelText: currentUserInfo?.emailAddress,
+                      labelText: userInformationModel.emailAddress,
                       formName: "Email Address",
                       enabled: false,
                       fillColor: Theme.of(context).primaryColor,
@@ -289,7 +302,7 @@ class _UAdditionalFormState extends State<UAdditionalForm> {
                     ),
                     const SizedBox(height: 20,),
                     SFormField(
-                      labelText: currentUserInfo?.phoneNumber,
+                      labelText: "${userInformationModel.phoneInfo.phoneCountryCode}${userInformationModel.phoneInfo.phone}",
                       formName: "Phone Number",
                       enabled: false,
                       fillColor: Theme.of(context).primaryColor,
@@ -475,8 +488,9 @@ class _UAdditionalFormState extends State<UAdditionalForm> {
                 ),
                 SButton(
                   onClick: () => validate(context),
-                  text: "Finish",
+                  text: "Next",
                   width: width,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   textWeight: FontWeight.bold,
                   textSize: 18,
                 )

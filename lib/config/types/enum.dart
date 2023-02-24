@@ -9,3 +9,16 @@ enum Services{
   mechanic,
   barber
 }
+
+enum CardType {
+  otherBrand,
+  mastercard,
+  visa,
+  americanExpress,
+  discover,
+}
+
+enum TransactionType{
+  incoming,
+  outgoing
+}
